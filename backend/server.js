@@ -6,6 +6,8 @@ import helmet from 'helmet';
 import { connectDB } from './config/db.js';
 
 import connectionRoutes from './routes/connection.route.js';
+import authRoutes from './routes/auth.route.js';
+import userRoutes from './routes/user.route.js';
 
 import errorMiddleware from './middlewares/error.middleware.js';
 import cookieParser from 'cookie-parser';
@@ -15,6 +17,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Middleware to parse JSON bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -43,10 +46,13 @@ app.use(
 
 // Routes for API calls
 app.use('/api/connection', connectionRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);
 
+// http://localhost:${PORT}
 app.listen(PORT, async () => {
     connectDB();
     console.log(`SYSTEMAIDE Server running on port ${PORT}`);

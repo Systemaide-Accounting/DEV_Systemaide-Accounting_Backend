@@ -1,9 +1,8 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
-import e from "express";
 
+// the accessToken serves as the bearer token for endpoints that verifies users that are logged in
 export const isAuthorized = async (req, res, next) => {
-    // the accessToken serves as the bearer token
     try {
         const token = req.headers.authorization;
         if (!token || !token.startsWith("Bearer")) {
@@ -19,11 +18,11 @@ export const isAuthorized = async (req, res, next) => {
 
         const user = await User.findById(decodedToken.id).select("-password");
 
-        if(!user) {
-            return res.status(404).json({
-                success: false,
-                message: "Unauthorized",
-            });
+        if (!user || user?.status === "blocked") {
+          return res.status(404).json({
+            success: false,
+            message: "Unauthorized",
+          });
         }
 
         req.user = user;
@@ -39,7 +38,9 @@ export const isAuthorized = async (req, res, next) => {
 export const isBearerTokenValid = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
-    if (!token || !token.startsWith("Bearer")) {
+    // console.log(token);
+    
+    if (!token || !token.startsWith("Bearer ")) {
       return res.status(404).json({
         success: false,
         message: "Unauthorized",
@@ -50,10 +51,10 @@ export const isBearerTokenValid = async (req, res, next) => {
 
     const decodedToken = jwt.verify(bearerToken, process.env.API_BEARER_SECRET);
 
-    const isValid =
-      decodedToken?.securityToken === process.env.API_SECURITY_TOKEN;
+    // const isValid =
+    //   decodedToken?.securityToken !== process.env.API_SECURITY_TOKEN;
 
-    if (!isValid) {
+    if (decodedToken?.securityToken !== process.env.API_SECURITY_TOKEN) {
       return res.status(404).json({
         success: false,
         message: "Unauthorized",
@@ -69,14 +70,14 @@ export const isBearerTokenValid = async (req, res, next) => {
 
 export const isSysAdmin = async (req, res, next) => {
     try {
-        if(req.user.role !== "sysadmin") {
-            return res.status(403).json({
-                success: false,
-                message: "Forbidden",
-            });
+        if(req.user.role === "sysadmin") { 
+            return next();
         }
         
-        next();
+        return res.status(403).json({
+          success: false,
+          message: "Forbidden",
+        });
     } catch (error) {
         error.statusCode = 403;
         next(error);
@@ -85,14 +86,14 @@ export const isSysAdmin = async (req, res, next) => {
 
 export const isAdmin = async (req, res, next) => {
     try {
-        if(req.user.role !== "admin") {
-            return res.status(403).json({
-                success: false,
-                message: "Forbidden",
-            });
+        if(req.user.role === "sysadmin" || req.user.role === "admin") {
+           return next(); 
         }
         
-        next();
+        return res.status(403).json({
+          success: false,
+          message: "Forbidden",
+        });
     } catch (error) {
         error.statusCode = 403;
         next(error);
@@ -101,14 +102,13 @@ export const isAdmin = async (req, res, next) => {
 
 export const isManager = async (req, res, next) => {
     try {
-        if(req.user.role !== "manager") {
-            return res.status(403).json({
-                success: false,
-                message: "Forbidden",
-            });
+        if (req.user.role === "sysadmin" || req.user.role === "manager") {
+          return next();
         }
-        
-        next();
+        return res.status(403).json({
+          success: false,
+          message: "Forbidden",
+        });
     } catch (error) {
         error.statusCode = 403;
         next(error);
@@ -117,14 +117,14 @@ export const isManager = async (req, res, next) => {
 
 export const isRegular = async (req, res, next) => {
     try {
-        if(req.user.role !== "regular") {
-            return res.status(403).json({
-                success: false,
-                message: "Forbidden",
-            });
+        if (req.user.role === "sysadmin" || req.user.role === "regular") {
+          return next();
         }
         
-        next();
+        return res.status(403).json({
+          success: false,
+          message: "Forbidden",
+        });
     } catch (error) {
         error.statusCode = 403;
         next(error);

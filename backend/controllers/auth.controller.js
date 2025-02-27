@@ -21,8 +21,7 @@ export const signIn = async (req, res, next) => {
 
       const existingUser = await User.findOne({ email });
 
-      const isCredentialsCorrect =
-        existingUser && (await bcrypt.compare(password, existingUser.password));
+      const isCredentialsCorrect = existingUser && (await bcrypt.compare(password, existingUser?.password));
 
       if (!isCredentialsCorrect) {
         return res.status(400).json({
@@ -50,4 +49,34 @@ export const signIn = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+
+export const verifyUser = async (req, res, next) => {
+  try {
+    const { accessToken } = req.body;
+    if (!accessToken) {
+      return res.status(404).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const decodedToken = jwt.verify(accessToken, process.env.JWT_SECRET);
+
+    const user = await User.findById(decodedToken.id).select("-password");
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    error.statusCode = 401;
+    next(error);
+  }
 };

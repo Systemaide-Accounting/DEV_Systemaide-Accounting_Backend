@@ -121,8 +121,9 @@ export const blockUser = async (req, res, next) => {
     }
 
     // update the status into blocked
-    const updatedUser = await User.findByIdAndUpdate(userId,
-      { status: "blocked" },
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId, status: { $ne: "blocked" } },
+      { status: "blocked", blockedAt: new Date() },
       { new: true, runValidators: true }
     );
 
@@ -141,8 +142,3 @@ export const blockUser = async (req, res, next) => {
     next(error);
   }
 };
-
-// then .... proceed to:
-// Company Information Table Schema
-// Agent Information Table Schema
-// Chart of Accounts Table Schema

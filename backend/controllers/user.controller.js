@@ -48,7 +48,10 @@ export const getUserById = async (req, res, next) => {
       });
     }
 
-    const user = await User.findById(userId).select("-password");
+    const user = await User.findOne({
+      _id: userId,
+      status: { $ne: "blocked" },
+    }).select("-password");
 
     if(!user) {
       return res.status(404).json({
@@ -87,10 +90,13 @@ export const updateUser = async (req, res, next) => {
     //   });
     // }
 
-    const updatedUser = await User.findByIdAndUpdate(userId, user, {
-      new: true,
-      runValidators: true, // Run schema validations
-    });
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId, status: { $ne: "blocked" } }, 
+      user, 
+      { 
+        new: true, runValidators: true, // Run schema validations
+      }
+    );
 
     if(!updatedUser) {
       return res.status(404).json({
@@ -121,8 +127,9 @@ export const blockUser = async (req, res, next) => {
     }
 
     // update the status into blocked
-    const updatedUser = await User.findByIdAndUpdate(userId,
-      { status: "blocked" },
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId, status: { $ne: "blocked" } },
+      { status: "blocked", blockedAt: new Date() },
       { new: true, runValidators: true }
     );
 
@@ -141,8 +148,3 @@ export const blockUser = async (req, res, next) => {
     next(error);
   }
 };
-
-// then .... proceed to:
-// Company Information Table Schema
-// Agent Information Table Schema
-// Chart of Accounts Table Schema

@@ -5,11 +5,14 @@ import helmet from 'helmet';
 
 import { connectDB } from './config/db.js';
 
+// ROUTES
 import connectionRoutes from './routes/connection.route.js';
 import authRoutes from './routes/auth.route.js';
 import userRoutes from './routes/user.route.js';
-
+import companyInfoRoutes from './routes/companyInfo.route.js';
+// MIDDLEWARES
 import errorMiddleware from './middlewares/error.middleware.js';
+
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -48,6 +51,7 @@ app.use(
 app.use('/api/connection', connectionRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/company', companyInfoRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);

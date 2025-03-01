@@ -63,7 +63,10 @@ export const verifyUser = async (req, res, next) => {
 
     const decodedToken = jwt.verify(accessToken, process.env.JWT_SECRET);
 
-    const user = await User.findById(decodedToken.id).select("-password");
+    const user = await User.findOne({
+      _id: decodedToken.id,
+      status: { $ne: "blocked" }
+    }).select("-password");
     
     if (!user) {
       return res.status(404).json({

@@ -19,7 +19,12 @@ export const signIn = async (req, res, next) => {
         });
       }
 
-      const existingUser = await User.findOne({ email });
+      const existingUser = await User.findOne(
+        {
+          email: email,
+          status: { $ne: "blocked" },
+        }
+      );
 
       const isCredentialsCorrect = existingUser && (await bcrypt.compare(password, existingUser?.password));
 

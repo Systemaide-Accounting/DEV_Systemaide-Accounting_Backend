@@ -5,7 +5,6 @@ const agentInfoSchema = mongoose.Schema(
     tin: {
       type: String,
       required: [true, "TIN is required"],
-      unique: true,
       maxlength: [20, "TIN cannot exceed 20 characters"],
       trim: true,
     },
@@ -67,6 +66,13 @@ const agentInfoSchema = mongoose.Schema(
       required: [true, "Fax is required"],
       maxlength: [50, "Fax cannot exceed 50 characters"],
       trim: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
     },
   },
   {

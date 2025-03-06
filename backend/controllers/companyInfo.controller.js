@@ -54,7 +54,7 @@ export const getCompanyById = async (req, res, next) => {
   try {
     const { id: companyId } = req.params;
 
-    if(!mongoose.Types.ObjectId.isValid(companyId)) {
+    if (!mongoose.Types.ObjectId.isValid(companyId)) {
       return res.status(404).json({
         success: false,
         message: "Company not found",
@@ -100,7 +100,7 @@ export const updateCompany = async (req, res, next) => {
 
     // Check for existing company with the same TIN, excluding the current company, and is not soft deleted
     const existingCompany = await CompanyInfo.findOne({
-      tin: company.tin,
+      tin: company?.tin,
       _id: { $ne: companyId },
       isDeleted: { $ne: true },
     });
@@ -150,13 +150,13 @@ export const deleteCompany = async (req, res, next) => {
         }
 
         // update the isDeleted to true and deletedAt to date today
-        const updatedCompany = await CompanyInfo.findOneAndUpdate(
+        const deletedCompany = await CompanyInfo.findOneAndUpdate(
           { _id: companyId, isDeleted: { $ne: true } }, //filter
           { isDeleted: true, deletedAt: new Date() }, //update
           { new: true, runValidators: true }
         );
 
-        if (!updatedCompany) {
+        if (!deletedCompany) {
             return res.status(404).json({
               success: false,
               message: "Company not found",
@@ -165,7 +165,7 @@ export const deleteCompany = async (req, res, next) => {
 
         res.status(200).json({
           success: true,
-          data: updatedCompany,
+          data: deletedCompany,
         });
     } catch (error) {
         next(error);

@@ -11,6 +11,7 @@ import authRoutes from './routes/auth.route.js';
 import userRoutes from './routes/user.route.js';
 import companyInfoRoutes from './routes/companyInfo.route.js';
 import agentInfoRoutes from './routes/agentInfo.route.js';
+import chartOfAccountRoutes from './routes/chartOfAccount.route.js';
 // MIDDLEWARES
 import errorMiddleware from './middlewares/error.middleware.js';
 
@@ -54,7 +55,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/company', companyInfoRoutes);
 app.use('/api/agent', agentInfoRoutes);
-
+app.use('/api/chart-of-account', chartOfAccountRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);

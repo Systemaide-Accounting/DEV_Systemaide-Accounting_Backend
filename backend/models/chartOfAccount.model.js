@@ -5,7 +5,6 @@ const chartOfAccountSchema = mongoose.Schema(
     accountCode: {
       type: String,
       required: [true, "Account code is required"],
-      unique: true,
       maxlength: [20, "Account code cannot exceed 20 characters"],
       trim: true,
     },
@@ -17,20 +16,28 @@ const chartOfAccountSchema = mongoose.Schema(
     },
     accountType: {
       type: String,
-      required: [true, "Account type is required"],
+      // required: [true, "Account type is required"],
       enum: ["asset", "liability", "equity", "revenue", "expense"],
       trim: true,
     },
     normalBalance: {
       type: String,
-      required: [true, "Normal balance is required"],
+      // required: [true, "Normal balance is required"],
       enum: ["debit", "credit"],
       trim: true,
     },
-    // not yet finished
-    // parentAccount:{
-
-    // }
+    parentAccount: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ChartOfAccount",
+      trim: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

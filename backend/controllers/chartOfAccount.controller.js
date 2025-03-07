@@ -19,7 +19,7 @@ const isParentAccountExisting = async (account) => {
 
 export const getAllAccounts = async (req, res, next) => {
     try {
-        const accounts = await ChartOfAccount.find({ isDeleted: { $ne: true } });
+        const accounts = await ChartOfAccount.find({ isDeleted: { $ne: true } }).populate("parentAccount");
         res.status(200).json({
           success: true,
           data: accounts,
@@ -84,9 +84,9 @@ export const getAccountById = async (req, res, next) => {
         }
 
         const account = await ChartOfAccount.findOne({
-            _id: accountId,
-            isDeleted: { $ne: true },
-        });
+          _id: accountId,
+          isDeleted: { $ne: true },
+        }).populate("parentAccount");
 
         if (!account) {
             return res.status(404).json({
@@ -137,7 +137,7 @@ export const updateAccount = async (req, res, next) => {
             { _id: accountId, isDeleted: { $ne: true } },
             account,
             { new: true, runValidators: true }
-        );
+        ).populate("parentAccount");
 
         if (!updatedAccount) {
             return res.status(404).json({

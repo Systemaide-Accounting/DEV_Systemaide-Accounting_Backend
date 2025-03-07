@@ -9,6 +9,14 @@ const isAccountCodeExisting = async (account) => {
     return existingAccount;
 };
 
+const isParentAccountExisting = async (account) => {
+    const existingParentAccount = await ChartOfAccount.findOne({
+      _id: account?.parentAccount,
+      isDeleted: { $ne: true },
+    });
+    return existingParentAccount;
+};
+
 export const getAllAccounts = async (req, res, next) => {
     try {
         const accounts = await ChartOfAccount.find({ isDeleted: { $ne: true } });
@@ -29,6 +37,19 @@ export const createAccount = async (req, res, next) => {
         delete account.isDeleted;
         delete account.deletedAt;
 
+        if(!account?.parentAccount) {
+            delete account.parentAccount;
+        }
+
+        const parentAccount = await isParentAccountExisting(account);
+        
+        if ((account?.parentAccount && !mongoose.Types.ObjectId.isValid(account.parentAccount)) || !parentAccount) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid parent account code",
+            });
+        }
+
         const existingAccount = await isAccountCodeExisting(account);
 
         if (existingAccount) {
@@ -38,7 +59,9 @@ export const createAccount = async (req, res, next) => {
             });
         }
 
-        const newAccount = await ChartOfAccount.create(account);
+        // const newAccount = await ChartOfAccount.create(account);
+        let newAccount = await ChartOfAccount.create(account);
+        newAccount = await newAccount.populate("parentAccount");
 
         res.status(201).json({
             success: true,

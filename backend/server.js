@@ -13,6 +13,7 @@ import companyInfoRoutes from './routes/companyInfo.route.js';
 import agentInfoRoutes from './routes/agentInfo.route.js';
 import chartOfAccountRoutes from './routes/chartOfAccount.route.js';
 import permissionRoutes from './routes/permission.route.js';
+import roleRoutes from './routes/role.route.js';
 // MIDDLEWARES
 import errorMiddleware from './middlewares/error.middleware.js';
 
@@ -53,11 +54,12 @@ app.use(
 // Routes for API calls
 app.use('/api/connection', connectionRoutes);
 app.use('/api/users', userRoutes);
+app.use("/api/permissions", permissionRoutes);
+app.use("/api/roles", roleRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/company', companyInfoRoutes);
 app.use('/api/agent', agentInfoRoutes);
 app.use('/api/chart-of-account', chartOfAccountRoutes);
-app.use('/api/permissions', permissionRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);

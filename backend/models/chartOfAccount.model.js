@@ -17,13 +17,13 @@ const chartOfAccountSchema = mongoose.Schema(
     accountType: {
       type: String,
       // required: [true, "Account type is required"],
-      enum: ["asset", "liability", "equity", "revenue", "expense"],
+      enum: ["", "asset", "liability", "equity", "revenue", "expense"],
       trim: true,
     },
     normalBalance: {
       type: String,
       // required: [true, "Normal balance is required"],
-      enum: ["debit", "credit"],
+      enum: ["", "debit", "credit"],
       trim: true,
     },
     parentAccount: {

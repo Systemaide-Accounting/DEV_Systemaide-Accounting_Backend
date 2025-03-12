@@ -15,6 +15,8 @@ const permissionSchema = mongoose.Schema({
     timestamps: true,
 });
 
+const Permission = mongoose.model("Permission", permissionSchema);
+
 // Initialize default permissions
 (async () => {
   try {
@@ -79,7 +81,5 @@ const permissionSchema = mongoose.Schema({
     console.error("Error initializing permissions: ", error);
   }
 })();
-
-const Permission = mongoose.model("Permission", permissionSchema);
 
 export default Permission;

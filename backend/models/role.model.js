@@ -22,6 +22,8 @@ const roleSchema = mongoose.Schema(
   }
 );
 
+const Role = mongoose.model("Role", roleSchema);
+
 // Initialize sysadmin role
 (async () => {
     try {
@@ -41,7 +43,5 @@ const roleSchema = mongoose.Schema(
       console.error("Error initializing sysadmin role: ", error);
     }
 })();
-
-const Role = mongoose.model("Role", roleSchema);
 
 export default Role;

@@ -25,6 +25,18 @@ export const createUser = async (req, res, next) => {
       });
     }
 
+    // Hash the password
+    if (user?.password) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(user.password, salt);
+      user.password = hashedPassword;
+    } else {
+      const salt = await bcrypt.genSalt(10);
+      const password = process.env.DEFAULT_SYSADMIN_PASSWORD;
+      const hashedPassword = await bcrypt.hash(password, salt);
+      user.password = hashedPassword;
+    }
+
     const newUser = await User.create(user);
 
     res.status(201).json({

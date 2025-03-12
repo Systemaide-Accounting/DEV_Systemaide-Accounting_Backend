@@ -44,6 +44,9 @@ const userSchema = mongoose.Schema(
       enum: ["regular", "manager", "admin", "sysadmin"],
       default: "regular",
       required: [true, "Role is required"],
+      // type: mongoose.Schema.Types.ObjectId,
+      // ref: "Role",
+      // required: [true, "Role is required"],
     },
     status: {
       type: String,
@@ -87,8 +90,3 @@ const User = mongoose.model("User", userSchema);
 })();
 
 export default User;
-
-// then .... proceed to:
-// Company Information Table Schema
-// Agent Information Table Schema
-// Chart of Accounts Table Schema

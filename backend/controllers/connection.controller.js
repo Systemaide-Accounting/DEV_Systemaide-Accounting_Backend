@@ -48,7 +48,7 @@ const initializePermissions = async () => {
     try {
       const defaultPermissions = [
         {
-          name: "viewUsers",
+          name: "viewAllUsers",
           description: "View Users",
         },
         {
@@ -64,7 +64,7 @@ const initializePermissions = async () => {
           description: "Update User",
         },
         {
-          name: "viewRoles",
+          name: "viewAllRoles",
           description: "View Roles",
         },
         {
@@ -80,7 +80,7 @@ const initializePermissions = async () => {
           description: "Update Role",
         },
         {
-          name: "viewPermissions",
+          name: "viewAllPermissions",
           description: "View Permissions",
         },
         {

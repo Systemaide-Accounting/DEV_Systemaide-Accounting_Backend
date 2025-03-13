@@ -23,7 +23,7 @@ const Permission = mongoose.model("Permission", permissionSchema);
     
     const defaultPermissions = [
         {
-            name: "viewUsers",
+            name: "viewAllUsers",
             description: "View Users",
         },
         {
@@ -39,7 +39,7 @@ const Permission = mongoose.model("Permission", permissionSchema);
             description: "Update User",
         },
         {
-            name: "viewRoles",
+            name: "viewAllRoles",
             description: "View Roles",
         },
         {
@@ -55,7 +55,7 @@ const Permission = mongoose.model("Permission", permissionSchema);
             description: "Update Role",
         },
         {
-            name: "viewPermissions",
+            name: "viewAllPermissions",
             description: "View Permissions",
         },
         {

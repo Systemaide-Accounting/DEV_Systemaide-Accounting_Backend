@@ -64,6 +64,10 @@ const initializePermissions = async () => {
           description: "Update User",
         },
         {
+          name: "deleteUser",
+          description: "Delete User",
+        },
+        {
           name: "viewAllRoles",
           description: "View Roles",
         },
@@ -80,6 +84,10 @@ const initializePermissions = async () => {
           description: "Update Role",
         },
         {
+          name: "deleteRole",
+          description: "Delete Role",
+        },
+        {
           name: "viewAllPermissions",
           description: "View Permissions",
         },
@@ -94,6 +102,10 @@ const initializePermissions = async () => {
         {
           name: "updatePermission",
           description: "Update Permission",
+        },
+        {
+          name: "deletePermission",
+          description: "Delete Permission",
         },
       ];
 

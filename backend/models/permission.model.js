@@ -39,6 +39,10 @@ const Permission = mongoose.model("Permission", permissionSchema);
             description: "Update User",
         },
         {
+            name: "deleteUser",
+            description: "Delete User",
+        },
+        {
             name: "viewAllRoles",
             description: "View Roles",
         },
@@ -55,6 +59,10 @@ const Permission = mongoose.model("Permission", permissionSchema);
             description: "Update Role",
         },
         {
+            name: "deleteRole",
+            description: "Delete Role",
+        },
+        {
             name: "viewAllPermissions",
             description: "View Permissions",
         },
@@ -69,7 +77,11 @@ const Permission = mongoose.model("Permission", permissionSchema);
         {
             name: "updatePermission",
             description: "Update Permission",
-        }
+        },
+        {
+            name: "deletePermission",
+            description: "Delete Permission",
+        },
     ];
 
     const count = await Permission.estimatedDocumentCount();

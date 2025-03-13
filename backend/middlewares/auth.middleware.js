@@ -1,36 +1,53 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
+import Role from "../models/role.model.js";
 
 // the accessToken serves as the bearer token for endpoints that verifies users that are logged in
 export const isAuthorized = async (req, res, next) => {
     try {
-        const token = req.headers.authorization;
-        if (!token || !token.startsWith("Bearer")) {
-          return res.status(404).json({
-            success: false,
-            message: "Unauthorized",
-          });
-        }
+      const token = req.headers.authorization;
+      if (!token || !token.startsWith("Bearer")) {
+        return res.status(404).json({
+          success: false,
+          message: "Unauthorized",
+        });
+      }
 
-        const accessToken = token.split(" ")[1];
+      const accessToken = token.split(" ")[1];
 
-        const decodedToken = jwt.verify(accessToken, process.env.JWT_SECRET);
+      const decodedToken = jwt.verify(accessToken, process.env.JWT_SECRET);
 
-        const user = await User.findOne({
-          _id: decodedToken?.id,
-          status: { $ne: "blocked" },
-        }).select("-password");
+      const user = await User.findOne({
+        _id: decodedToken?.id,
+        status: { $ne: "blocked" },
+      }).select("-password");
 
-        if (!user) {
-          return res.status(404).json({
-            success: false,
-            message: "Unauthorized",
-          });
-        }
+      const userObject = user.toObject();
 
-        req.user = user;
+      // Populate permissions from role
+      const populatedPermissionsFromRole = await Role.findOne({
+        name: user.role,
+      })
+        .populate("permissions", "name -_id") // Populate only the name field
+        .select("permissions -_id") // Exclude _id from Role model
+        .lean();
+      // format the permissions to an array of strings
+      userObject.permissions =
+        populatedPermissionsFromRole?.permissions?.map(
+          (permission) => permission.name
+        ) || [];
 
-        next();
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "Unauthorized",
+        });
+      }
+
+      // req.user = user;
+      req.user = userObject;
+
+      next();
     } catch (error) {
         error.statusCode = 401;
         next(error);
@@ -133,3 +150,4 @@ export const isRegular = async (req, res, next) => {
         next(error);
     }
 }
+

@@ -15,13 +15,15 @@ const permissionSchema = mongoose.Schema({
     timestamps: true,
 });
 
+const Permission = mongoose.model("Permission", permissionSchema);
+
 // Initialize default permissions
 (async () => {
   try {
     
     const defaultPermissions = [
         {
-            name: "viewUsers",
+            name: "viewAllUsers",
             description: "View Users",
         },
         {
@@ -37,7 +39,11 @@ const permissionSchema = mongoose.Schema({
             description: "Update User",
         },
         {
-            name: "viewRoles",
+            name: "deleteUser",
+            description: "Delete User",
+        },
+        {
+            name: "viewAllRoles",
             description: "View Roles",
         },
         {
@@ -53,7 +59,11 @@ const permissionSchema = mongoose.Schema({
             description: "Update Role",
         },
         {
-            name: "viewPermissions",
+            name: "deleteRole",
+            description: "Delete Role",
+        },
+        {
+            name: "viewAllPermissions",
             description: "View Permissions",
         },
         {
@@ -67,7 +77,11 @@ const permissionSchema = mongoose.Schema({
         {
             name: "updatePermission",
             description: "Update Permission",
-        }
+        },
+        {
+            name: "deletePermission",
+            description: "Delete Permission",
+        },
     ];
 
     const count = await Permission.estimatedDocumentCount();
@@ -79,7 +93,5 @@ const permissionSchema = mongoose.Schema({
     console.error("Error initializing permissions: ", error);
   }
 })();
-
-const Permission = mongoose.model("Permission", permissionSchema);
 
 export default Permission;

@@ -2,9 +2,16 @@ import User from "../models/user.model.js";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
+const validatePassword = (password) => {
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
+  return passwordRegex.test(password);
+};
+
 export const getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find({}).select("-password");
+    const users = await User.find({ status: { $ne: "blocked" } }).select(
+      "-password"
+    );
     res.status(200).json({
       success: true,
       data: users,
@@ -27,6 +34,15 @@ export const createUser = async (req, res, next) => {
 
     // Hash the password
     if (user?.password) {
+      // Validate password before hashing
+      if (!validatePassword(user?.password)) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+        });
+      }
+
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(user.password, salt);
       user.password = hashedPassword;
@@ -43,7 +59,6 @@ export const createUser = async (req, res, next) => {
       success: true,
       data: newUser,
     });
-
   } catch (error) {
     next(error);
   }

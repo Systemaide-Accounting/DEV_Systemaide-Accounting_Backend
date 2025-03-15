@@ -228,3 +228,234 @@ export const hasDeletePermission = async (req, res, next) => {
         next(error);
     }
 };
+
+// AgentInfo Permissions
+export const hasViewAllAgents = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewAllAgents")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view all agents",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasCreateAgent = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("createAgent")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to create agent",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasViewAgentById = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewAgentById")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view agent by id",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasUpdateAgent = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("updateAgent")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to update agent",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasDeleteAgent = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("deleteAgent")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to delete agent",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+
+// CompanyInfo Permissions
+export const hasViewAllCompanies = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewAllCompanies")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view all companies",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasCreateCompany = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("createCompany")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to create company",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasViewCompanyById = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewCompanyById")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view company by id",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasUpdateCompany = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("updateCompany")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to update company",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasDeleteCompany = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("deleteCompany")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to delete company",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+
+// ChartOfAccount Permissions
+export const hasViewAllAccounts = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewAllAccounts")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view all accounts",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasCreateAccount = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("createAccount")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to create account",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasViewAccountById = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewAccountById")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view account by id",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasUpdateAccount = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("updateAccount")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to update account",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasDeleteAccount = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("deleteAccount")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to delete account",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};

@@ -20,10 +20,10 @@ export const getAllLocations = async (req, res, next) => {
         const locations = await Location.find({ isDeleted: { $ne: true } }).populate("branch");
 
         // check if branch is deleted
-        locations.forEach((location) => {
-            if (location.branch && isBranchDeleted(location.branch)) {
-                location.branch = null;
-            }
+        locations.forEach(async (location) => {
+          if (location.branch && (await isBranchDeleted(location.branch))) {
+            location.branch = null;
+          }
         });
 
         res.status(200).json({
@@ -55,8 +55,8 @@ export const createLocation = async (req, res, next) => {
         if(!location?.branch) {
             delete location.branch;
         }
-
-        if (!mongoose.Types.ObjectId.isValid(location?.branch) || (location.branch && isBranchDeleted(location.branch))) {
+        
+        if (!mongoose.Types.ObjectId.isValid(location?.branch) || (location.branch && await isBranchDeleted(location.branch))) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid branch input",
@@ -67,7 +67,7 @@ export const createLocation = async (req, res, next) => {
         newLocation = await newLocation.populate("branch");
 
         // check if branch is deleted
-        if (newLocation.branch && isBranchDeleted(newLocation.branch)) {
+        if (newLocation.branch && await isBranchDeleted(newLocation.branch)) {
             newLocation.branch = null;
         }
 
@@ -104,7 +104,7 @@ export const getLocationById = async (req, res, next) => {
         }
 
         // check if branch is deleted
-        if (location.branch && isBranchDeleted(location.branch)) {
+        if (location.branch && await isBranchDeleted(location.branch)) {
             location.branch = null;
         }
 
@@ -160,7 +160,7 @@ export const updateLocation = async (req, res, next) => {
         }
 
         // check if branch is deleted
-        if (updatedLocation.branch && isBranchDeleted(updatedLocation.branch)) {
+        if (updatedLocation.branch && await isBranchDeleted(updatedLocation.branch)) {
             updatedLocation.branch = null;
         }
 

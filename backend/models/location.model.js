@@ -21,16 +21,16 @@ const locationSchema = mongoose.Schema(
     },
     machineId: {
       type: String,
-      required: [true, "Machine ID is required"],
+      // required: [true, "Machine ID is required"],
       maxlength: [50, "Machine ID cannot exceed 50 characters"],
       trim: true,
     },
     branch: {
       type: String,
-      required: [true, "Branch is required"],
+      // required: [true, "Branch is required"],
       // maxlength: [50, "Branch cannot exceed 50 characters"],
-      enum: ["main"],
-      default: "main",
+      enum: ["", "main"],
+      default: "",
       trim: true,
     },
     isDeleted: {

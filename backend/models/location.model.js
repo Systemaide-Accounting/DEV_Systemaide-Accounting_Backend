@@ -28,7 +28,9 @@ const locationSchema = mongoose.Schema(
     branch: {
       type: String,
       required: [true, "Branch is required"],
-      maxlength: [50, "Branch cannot exceed 50 characters"],
+      // maxlength: [50, "Branch cannot exceed 50 characters"],
+      enum: ["main"],
+      default: "main",
       trim: true,
     },
     isDeleted: {

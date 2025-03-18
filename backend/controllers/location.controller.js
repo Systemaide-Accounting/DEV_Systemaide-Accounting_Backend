@@ -51,16 +51,16 @@ export const createLocation = async (req, res, next) => {
                 message: "Location TIN already exists",
             });
         }
-
-        if(!location?.branch) {
-            delete location.branch;
-        }
         
-        if (!mongoose.Types.ObjectId.isValid(location?.branch) || (location.branch && await isBranchDeleted(location.branch))) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid branch input",
-            });
+        if(location?.branch) {
+          if (!mongoose.Types.ObjectId.isValid(location?.branch) || (location.branch && await isBranchDeleted(location.branch))) {
+              return res.status(400).json({
+                  success: false,
+                  message: "Invalid branch input",
+              });
+          }
+        } else {
+          delete location.branch;
         }
 
         let newLocation = await Location.create(location);
@@ -144,6 +144,17 @@ export const updateLocation = async (req, res, next) => {
                 success: false,
                 message: "Location TIN already exists",
             });
+        }
+
+        if(location?.branch) {
+          if (!mongoose.Types.ObjectId.isValid(location?.branch) || (location.branch && await isBranchDeleted(location.branch))) {
+              return res.status(400).json({
+                  success: false,
+                  message: "Invalid branch input",
+              });
+          }
+        } else {
+          location.branch = null;
         }
 
         const updatedLocation = await Location.findOneAndUpdate(

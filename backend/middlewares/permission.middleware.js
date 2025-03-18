@@ -537,3 +537,82 @@ export const hasDeleteLocation = async (req, res, next) => {
         next(error);
     }
 };
+
+// Branch Permissions
+export const hasViewAllBranches = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewAllBranches")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view all branches",
+        });
+    }
+    catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasCreateBranch = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("createBranch")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to create branch",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasViewBranchById = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewBranchById")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view branch by id",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasUpdateBranch = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("updateBranch")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to update branch",
+        });
+    }
+    catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasDeleteBranch = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("deleteBranch")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to delete branch",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};

@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
-const locationSchema = mongoose.Schema(
+const branchSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Location Name is required"],
-      maxlength: [255, "Location Name cannot exceed 255 characters"],
+      required: [true, "Branch Name is required"],
+      maxlength: [255, "Branch Name cannot exceed 255 characters"],
       trim: true,
     },
     address: {
@@ -25,17 +25,6 @@ const locationSchema = mongoose.Schema(
       maxlength: [50, "Machine ID cannot exceed 50 characters"],
       trim: true,
     },
-    branch: {
-      // type: String,
-      // // required: [true, "Branch is required"],
-      // // maxlength: [50, "Branch cannot exceed 50 characters"],
-      // enum: ["", "main"],
-      // default: "",
-      // trim: true,
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Branch",
-      trim: true,
-    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -49,6 +38,6 @@ const locationSchema = mongoose.Schema(
   }
 );
 
-const Location = mongoose.model("Location", locationSchema);
+const Branch = mongoose.model("Branch", branchSchema);
 
-export default Location;
+export default Branch;

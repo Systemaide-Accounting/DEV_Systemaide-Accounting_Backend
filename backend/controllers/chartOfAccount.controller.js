@@ -10,6 +10,7 @@ const isAccountCodeExisting = async (account) => {
 };
 
 const isParentAccountExisting = async (account) => {
+    if (!account?.parentAccount) return true;
     const existingParentAccount = await ChartOfAccount.findOne({
       _id: account?.parentAccount,
       isDeleted: { $ne: true },
@@ -20,6 +21,14 @@ const isParentAccountExisting = async (account) => {
 export const getAllAccounts = async (req, res, next) => {
     try {
         const accounts = await ChartOfAccount.find({ isDeleted: { $ne: true } }).populate("parentAccount");
+
+        // check if each parentAccount of account is deleted
+        accounts.forEach((account) => {
+            if (account.parentAccount && account.parentAccount.isDeleted) {
+                account.parentAccount = null;
+            }
+        });
+
         res.status(200).json({
           success: true,
           data: accounts,
@@ -42,8 +51,8 @@ export const createAccount = async (req, res, next) => {
         }
 
         const parentAccount = await isParentAccountExisting(account);
-        
-        if ((account?.parentAccount && !mongoose.Types.ObjectId.isValid(account.parentAccount)) || !parentAccount) {
+
+        if ((account.parentAccount && !mongoose.Types.ObjectId.isValid(account.parentAccount)) || !parentAccount) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid parent account code",
@@ -62,6 +71,11 @@ export const createAccount = async (req, res, next) => {
         // const newAccount = await ChartOfAccount.create(account);
         let newAccount = await ChartOfAccount.create(account);
         newAccount = await newAccount.populate("parentAccount");
+
+        // check if parentAccount is deleted
+        if (newAccount.parentAccount && newAccount.parentAccount.isDeleted) {
+            newAccount.parentAccount = null;
+        }
 
         res.status(201).json({
             success: true,
@@ -95,6 +109,11 @@ export const getAccountById = async (req, res, next) => {
             });
         }
 
+        // check if parentAccount is deleted
+        if (account.parentAccount && account.parentAccount.isDeleted) {
+            account.parentAccount = null;
+        }
+
         res.status(200).json({
             success: true,
             data: account,
@@ -112,6 +131,15 @@ export const updateAccount = async (req, res, next) => {
         // Remove restricted fields
         delete account.isDeleted;
         delete account.deletedAt;
+
+        const parentAccount = await isParentAccountExisting(account);
+
+        if ((account?.parentAccount && !mongoose.Types.ObjectId.isValid(account.parentAccount)) || !parentAccount) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid parent account code",
+            });
+        }
 
         if (!mongoose.Types.ObjectId.isValid(accountId)) {
             return res.status(404).json({
@@ -144,6 +172,11 @@ export const updateAccount = async (req, res, next) => {
                 success: false,
                 message: "Account not found",
             });
+        }
+
+        // check if parentAccount is deleted
+        if (updatedAccount.parentAccount && updatedAccount.parentAccount.isDeleted) {
+            updatedAccount.parentAccount = null;
         }
 
         res.status(200).json({

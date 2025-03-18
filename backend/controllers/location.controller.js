@@ -1,9 +1,23 @@
+import Branch from "../models/branch.model.js";
 import Location from "../models/location.model.js";
 import mongoose from "mongoose";
 
+const isBranchDeleted = async (branch) => {
+    const deletedBranch = await Branch.findOne({ _id: branch?._id, isDeleted: true });
+    return deletedBranch ? true : false;
+};
+
 export const getAllLocations = async (req, res, next) => {
     try {
-        const locations = await Location.find({ isDeleted: { $ne: true } });
+        const locations = await Location.find({ isDeleted: { $ne: true } }).populate("branch");
+
+        // check if branch is deleted
+        locations.forEach((location) => {
+            if (location.branch && isBranchDeleted(location.branch)) {
+                location.branch = null;
+            }
+        });
+
         res.status(200).json({
             success: true,
             data: locations,
@@ -21,7 +35,24 @@ export const createLocation = async (req, res, next) => {
         delete location.isDeleted;
         delete location.deletedAt;
 
-        const newLocation = await Location.create(location);
+        if(!location?.branch) {
+            delete location.branch;
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(location?.branch) || (location.branch && isBranchDeleted(location.branch))) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid branch input",
+            });
+        }
+
+        let newLocation = await Location.create(location);
+        newLocation = await newLocation.populate("branch");
+
+        // check if branch is deleted
+        if (newLocation.branch && isBranchDeleted(newLocation.branch)) {
+            newLocation.branch = null;
+        }
 
         res.status(201).json({
           success: true,
@@ -46,13 +77,18 @@ export const getLocationById = async (req, res, next) => {
         const location = await Location.findOne({
           _id: locationId,
           isDeleted: { $ne: true },
-        });
+        }).populate("branch");
 
         if (!location) {
           return res.status(404).json({
             success: false,
             message: "Location not found",
           });
+        }
+
+        // check if branch is deleted
+        if (location.branch && isBranchDeleted(location.branch)) {
+            location.branch = null;
         }
 
         res.status(200).json({
@@ -84,13 +120,18 @@ export const updateLocation = async (req, res, next) => {
             { _id: locationId, isDeleted: { $ne: true } },
             location,
             { new: true, runValidators: true }
-        );
+        ).populate("branch");
 
         if (!updatedLocation) {
           return res.status(404).json({
             success: false,
             message: "Location not found",
           });
+        }
+
+        // check if branch is deleted
+        if (updatedLocation.branch && isBranchDeleted(updatedLocation.branch)) {
+            updatedLocation.branch = null;
         }
 
         res.status(200).json({

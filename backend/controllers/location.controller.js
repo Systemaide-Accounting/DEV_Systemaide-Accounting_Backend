@@ -7,15 +7,23 @@ const isBranchDeleted = async (branch) => {
     return deletedBranch ? true : false;
 };
 
+const isLocationTINExisting = async (location) => {
+    const existingLocation = await Location.findOne({
+        tin: location?.tin,
+        isDeleted: { $ne: true },
+    });
+    return existingLocation;
+}
+
 export const getAllLocations = async (req, res, next) => {
     try {
         const locations = await Location.find({ isDeleted: { $ne: true } }).populate("branch");
 
         // check if branch is deleted
-        locations.forEach((location) => {
-            if (location.branch && isBranchDeleted(location.branch)) {
-                location.branch = null;
-            }
+        locations.forEach(async (location) => {
+          if (location.branch && (await isBranchDeleted(location.branch))) {
+            location.branch = null;
+          }
         });
 
         res.status(200).json({
@@ -35,22 +43,31 @@ export const createLocation = async (req, res, next) => {
         delete location.isDeleted;
         delete location.deletedAt;
 
-        if(!location?.branch) {
-            delete location.branch;
-        }
+        const existingLocation = await isLocationTINExisting(location);
 
-        if (!mongoose.Types.ObjectId.isValid(location?.branch) || (location.branch && isBranchDeleted(location.branch))) {
+        if (existingLocation) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid branch input",
+                message: "Location TIN already exists",
             });
+        }
+        
+        if(location?.branch) {
+          if (!mongoose.Types.ObjectId.isValid(location?.branch) || (location.branch && await isBranchDeleted(location.branch))) {
+              return res.status(400).json({
+                  success: false,
+                  message: "Invalid branch input",
+              });
+          }
+        } else {
+          delete location.branch;
         }
 
         let newLocation = await Location.create(location);
         newLocation = await newLocation.populate("branch");
 
         // check if branch is deleted
-        if (newLocation.branch && isBranchDeleted(newLocation.branch)) {
+        if (newLocation.branch && await isBranchDeleted(newLocation.branch)) {
             newLocation.branch = null;
         }
 
@@ -87,7 +104,7 @@ export const getLocationById = async (req, res, next) => {
         }
 
         // check if branch is deleted
-        if (location.branch && isBranchDeleted(location.branch)) {
+        if (location.branch && await isBranchDeleted(location.branch)) {
             location.branch = null;
         }
 
@@ -116,6 +133,30 @@ export const updateLocation = async (req, res, next) => {
           });
         }
 
+        const existingLocation = await Location.findOne({
+            tin: location?.tin,
+            isDeleted: { $ne: true },
+            _id: { $ne: locationId },
+        });
+
+        if (existingLocation) {
+            return res.status(400).json({
+                success: false,
+                message: "Location TIN already exists",
+            });
+        }
+
+        if(location?.branch) {
+          if (!mongoose.Types.ObjectId.isValid(location?.branch) || (location.branch && await isBranchDeleted(location.branch))) {
+              return res.status(400).json({
+                  success: false,
+                  message: "Invalid branch input",
+              });
+          }
+        } else {
+          location.branch = null;
+        }
+
         const updatedLocation = await Location.findOneAndUpdate(
             { _id: locationId, isDeleted: { $ne: true } },
             location,
@@ -130,7 +171,7 @@ export const updateLocation = async (req, res, next) => {
         }
 
         // check if branch is deleted
-        if (updatedLocation.branch && isBranchDeleted(updatedLocation.branch)) {
+        if (updatedLocation.branch && await isBranchDeleted(updatedLocation.branch)) {
             updatedLocation.branch = null;
         }
 

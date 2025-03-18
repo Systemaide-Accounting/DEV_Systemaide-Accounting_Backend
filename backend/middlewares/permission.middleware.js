@@ -459,3 +459,81 @@ export const hasDeleteAccount = async (req, res, next) => {
         next(error);
     }
 };
+
+// Location Permissions
+export const hasViewAllLocations = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewAllLocations")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view all locations",
+        });
+    }
+    catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasCreateLocation = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("createLocation")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to create location",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasViewLocationById = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewLocationById")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view location by id",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasUpdateLocation = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("updateLocation")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to update location",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasDeleteLocation = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("deleteLocation")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to delete location",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};

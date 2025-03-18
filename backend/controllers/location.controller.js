@@ -7,6 +7,14 @@ const isBranchDeleted = async (branch) => {
     return deletedBranch ? true : false;
 };
 
+const isLocationTINExisting = async (location) => {
+    const existingLocation = await Location.findOne({
+        tin: location?.tin,
+        isDeleted: { $ne: true },
+    });
+    return existingLocation;
+}
+
 export const getAllLocations = async (req, res, next) => {
     try {
         const locations = await Location.find({ isDeleted: { $ne: true } }).populate("branch");
@@ -34,6 +42,15 @@ export const createLocation = async (req, res, next) => {
         // Remove restricted fields
         delete location.isDeleted;
         delete location.deletedAt;
+
+        const existingLocation = await isLocationTINExisting(location);
+
+        if (existingLocation) {
+            return res.status(400).json({
+                success: false,
+                message: "Location TIN already exists",
+            });
+        }
 
         if(!location?.branch) {
             delete location.branch;
@@ -114,6 +131,19 @@ export const updateLocation = async (req, res, next) => {
             success: false,
             message: "Location not found",
           });
+        }
+
+        const existingLocation = await Location.findOne({
+            tin: location?.tin,
+            isDeleted: { $ne: true },
+            _id: { $ne: locationId },
+        });
+
+        if (existingLocation) {
+            return res.status(400).json({
+                success: false,
+                message: "Location TIN already exists",
+            });
         }
 
         const updatedLocation = await Location.findOneAndUpdate(

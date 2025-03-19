@@ -38,6 +38,48 @@ export const getAllAccounts = async (req, res, next) => {
     }
 };
 
+export const getAllParentAccounts = async (req, res, next) => {
+    try {
+        const parentAccounts = await ChartOfAccount.find({
+            parentAccount: null,
+            isDeleted: { $ne: true },
+        });
+
+        res.status(200).json({
+            success: true,
+            data: parentAccounts,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// get all child accounts of a parent account
+export const getChildAccounts = async (req, res, next) => {
+    try {
+        const { id: parentAccountId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(parentAccountId)) {
+            return res.status(404).json({
+                success: false,
+                message: "Parent account not found",
+            });
+        }
+
+        const childAccounts = await ChartOfAccount.find({
+            parentAccount: parentAccountId,
+            isDeleted: { $ne: true },
+        });
+
+        res.status(200).json({
+            success: true,
+            data: childAccounts,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const createAccount = async (req, res, next) => {
     try {
         const account = { ...req.body };

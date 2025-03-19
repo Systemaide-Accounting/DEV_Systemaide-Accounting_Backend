@@ -5,10 +5,13 @@ import {
   isRegular,
   isSysAdmin,
 } from "../middlewares/auth.middleware.js";
-import { createAccount, deleteAccount, getAccountById, getAllAccounts, updateAccount } from "../controllers/chartOfAccount.controller.js";
+import { createAccount, deleteAccount, getAccountById, getAllAccounts, getAllParentAccounts, getChildAccounts, updateAccount } from "../controllers/chartOfAccount.controller.js";
 import { hasCreateAccount, hasDeleteAccount, hasUpdateAccount, hasViewAccountById, hasViewAllAccounts } from "../middlewares/permission.middleware.js";
 
 const router = express.Router();
+
+router.get("/accounts/parent", isAuthorized, hasViewAllAccounts, getAllParentAccounts);
+router.get("/accounts/:id/child", isAuthorized, hasViewAllAccounts, getChildAccounts);
 
 router.get("/", isAuthorized, hasViewAllAccounts, getAllAccounts);
 router.get("/:id", isAuthorized, hasViewAccountById, getAccountById);

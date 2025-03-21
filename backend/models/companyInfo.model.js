@@ -15,6 +15,13 @@ const companyInfoSchema = mongoose.Schema(
       maxlength: [50, "Tax classification cannot exceed 50 characters"],
       trim: true,
     },
+    taxPayer: {
+      type: String,
+      // required: [true, "Taxpayer is required"],
+      // enum: ["corporation", "individual"],
+      // maxlength: [50, "Taxpayer cannot exceed 50 characters"],
+      trim: true,
+    },
     registeredName: {
       type: String,
       required: [true, "Registered name is required"],

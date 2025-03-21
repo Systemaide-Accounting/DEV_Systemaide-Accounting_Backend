@@ -21,8 +21,14 @@ const companyInfoSchema = mongoose.Schema(
       maxlength: [255, "Registered name cannot exceed 255 characters"],
       trim: true,
     },
+    tradeName: {
+      type: String,
+      maxlength: [255, "Trade name cannot exceed 255 characters"],
+      required: [true, "Trade name is required"],
+      trim: true,
+    },
     // value of businessAddress will be an object but it will be JSON.stringify() before saving to the database so it will be saved as a string
-    // it will be JSON.parse() when retrieving the data from the database
+    // it will be JSON.parse() when retrieving the data from the database in the front-end
     businessAddress: {
       type: String,
       required: [true, "Business address is required"],
@@ -31,25 +37,25 @@ const companyInfoSchema = mongoose.Schema(
     rdo: {
       type: String,
       required: [true, "RDO is required"],
-      maxlength: [10, "RDO cannot exceed 10 characters"],
+      // maxlength: [10, "RDO cannot exceed 10 characters"],
       trim: true,
     },
-    fiscalYear: {
+    fiscal: {
       type: String,
       // match: [/^\d{4}-\d{4}$/, "Fiscal year must be in the format YYYY-YYYY"],
-      validate: {
-        validator: function (v) {
-          if (!/^\d{4}-\d{4}$/.test(v)) {
-            return false; // Invalid format
-          }
-          const [startYear, endYear] = v.split("-").map(Number);
-          return endYear > startYear; // End year must be greater than start year
-        },
-        message: (props) =>
-          `${props.value} is not a valid fiscal year! End year must be greater than start year and the format should be YYYY-YYYY`,
-      },
-      required: [true, "Fiscal year is required"],
-      maxlength: [10, "Fiscal year cannot exceed 10 characters"],
+      // validate: {
+      //   validator: function (v) {
+      //     if (!/^\d{4}-\d{4}$/.test(v)) {
+      //       return false; // Invalid format
+      //     }
+      //     const [startYear, endYear] = v.split("-").map(Number);
+      //     return endYear > startYear; // End year must be greater than start year
+      //   },
+      //   message: (props) =>
+      //     `${props.value} is not a valid fiscal year! End year must be greater than start year and the format should be YYYY-YYYY`,
+      // },
+      required: [true, "Fiscal is required"],
+      // maxlength: [10, "Fiscal year cannot exceed 10 characters"],
       trim: true,
     },
     businessType: {
@@ -66,7 +72,7 @@ const companyInfoSchema = mongoose.Schema(
       required: [true, "Registration type is required"],
       trim: true,
     },
-    lineOfBusiness: {
+    businessLine: {
       type: String,
       required: [true, "Line of business is required"],
       maxlength: [100, "Line of business cannot exceed 100 characters"],
@@ -75,16 +81,13 @@ const companyInfoSchema = mongoose.Schema(
     telephoneFax: {
       type: String,
       // required: [true, "Telephone/Fax is required"],
-      maxlength: [50, "Telephone/Fax cannot exceed 50 characters"],
+      // maxlength: [50, "Telephone/Fax cannot exceed 50 characters"],
       trim: true,
     },
     authorizedRepresentative: {
       type: String,
       // required: [true, "Authorized representative is required"],
-      maxlength: [
-        255,
-        "Authorized representative cannot exceed 255 characters",
-      ],
+      // maxlength: [255, "Authorized representative cannot exceed 255 characters"],
       trim: true,
     },
     isDeleted: {

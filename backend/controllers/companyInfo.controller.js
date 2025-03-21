@@ -10,6 +10,29 @@ const isCompanyTINExisting = async (company) => {
   return existingCompany;
 };
 
+// get first 1 company
+export const getFirstCompany = async (req, res, next) => {
+  try {
+    const companyInfo = await CompanyInfo.findOne({ isDeleted: { $ne: true } })
+      .sort({ createdAt: -1 })
+      .limit(1);
+
+    if (!companyInfo) {
+      return res.status(404).json({
+        success: false,
+        message: "No company found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: companyInfo,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getAllCompanies = async (req, res, next) => {
  try {
     const companyInfos = await CompanyInfo.find({ isDeleted: { $ne: true } });

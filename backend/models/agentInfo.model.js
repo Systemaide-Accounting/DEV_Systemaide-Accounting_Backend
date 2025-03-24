@@ -17,6 +17,8 @@ const agentInfoSchema = mongoose.Schema(
     taxClassification: {
       type: String,
       required: [true, "Tax classification is required"],
+      enum: ["individual", "non-individual"],
+      // default: "individual",
       maxlength: [50, "Tax classification cannot exceed 50 characters"],
       trim: true,
     },
@@ -28,23 +30,29 @@ const agentInfoSchema = mongoose.Schema(
     },
     agentName: {
       type: String,
+      maxlength: [255, "Agent name cannot exceed 255 characters"],
       required: [true, "Agent name is required"],
       trim: true,
     },
     tradeName: {
       type: String,
+      maxlength: [255, "Trade name cannot exceed 255 characters"],
       required: [true, "Trade name is required"],
       trim: true,
     },
     agentType: {
       type: String,
       required: [true, "Agent type is required"],
+      enum: ["customer", "supplier", "government agency", "employee", "others"],
+      // default: "customer",
       maxlength: [50, "Agent type cannot exceed 50 characters"],
       trim: true,
     },
     registrationType: {
       type: String,
       required: [true, "Registration type is required"],
+      enum: ["vat", "non-vat"],
+      // default: "vat",
       maxlength: [50, "Registration type cannot exceed 50 characters"],
       trim: true,
     },

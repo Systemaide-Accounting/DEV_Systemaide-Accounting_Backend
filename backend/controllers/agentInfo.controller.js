@@ -7,7 +7,15 @@ const isAgentTINExisting = async (agent) => {
       isDeleted: { $ne: true },
     });
     return existingAgent;
-}
+};
+
+const isAgentCodeExisting = async (agent) => {
+  const existingAgent = await AgentInfo.findOne({
+    agentCode: agent?.agentCode,
+    isDeleted: { $ne: true },
+  });
+  return existingAgent;
+};
 
 export const getAllAgents = async (req, res, next) => {
     try {
@@ -29,12 +37,21 @@ export const createAgent = async (req, res, next) => {
         delete agent.isDeleted;
         delete agent.deletedAt;
 
-        const existingAgent = await isAgentTINExisting(agent);
+        const existingAgentTin = await isAgentTINExisting(agent);
 
-        if (existingAgent) {
+        if (existingAgentTin) {
           return res.status(400).json({
             success: false,
             message: "Agent TIN already exists",
+          });
+        }
+
+        const existingAgentCode = await isAgentCodeExisting(agent);
+
+        if (existingAgentCode) {
+          return res.status(400).json({
+            success: false,
+            message: "Agent code already exists",
           });
         }
 
@@ -97,16 +114,29 @@ export const updateAgent = async (req, res, next) => {
           });
         }
 
-        const existingAgent = await AgentInfo.findOne({
+        const existingAgentTin = await AgentInfo.findOne({
           tin: agent?.tin,
           _id: { $ne: agentId },
           isDeleted: { $ne: true },
         });
 
-        if (existingAgent) {
+        if (existingAgentTin) {
           return res.status(400).json({
             success: false,
             message: "Agent with the same TIN already exists",
+          });
+        }
+
+        const existingAgentCode = await AgentInfo.findOne({
+          agentCode: agent?.agentCode,
+          _id: { $ne: agentId },
+          isDeleted: { $ne: true },
+        });
+
+        if (existingAgentCode) {
+          return res.status(400).json({
+            success: false,
+            message: "Agent with the same code already exists",
           });
         }
 

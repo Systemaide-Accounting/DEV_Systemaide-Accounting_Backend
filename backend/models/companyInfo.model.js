@@ -12,7 +12,15 @@ const companyInfoSchema = mongoose.Schema(
       type: String,
       required: [true, "Tax classification is required"],
       enum: ["individual", "non-individual"],
+      // default: "individual",
       maxlength: [50, "Tax classification cannot exceed 50 characters"],
+      trim: true,
+    },
+    taxPayer: {
+      type: String,
+      // required: [true, "Taxpayer is required"],
+      // enum: ["corporation", "individual"],
+      // maxlength: [50, "Taxpayer cannot exceed 50 characters"],
       trim: true,
     },
     registeredName: {
@@ -67,8 +75,8 @@ const companyInfoSchema = mongoose.Schema(
     },
     registrationType: {
       type: String,
-      enum: ["vat registered"], // this can be added
-      default: "vat registered",
+      enum: ["vat", "non-vat"], // this can be added
+      // default: "vat",
       required: [true, "Registration type is required"],
       trim: true,
     },

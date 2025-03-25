@@ -43,7 +43,7 @@ const agentInfoSchema = mongoose.Schema(
     agentType: {
       type: String,
       required: [true, "Agent type is required"],
-      enum: ["customer", "supplier", "government agency", "employee", "others"],
+      enum: ["customer", "supplier", "government-agency", "employee", "others"],
       // default: "customer",
       maxlength: [50, "Agent type cannot exceed 50 characters"],
       trim: true,

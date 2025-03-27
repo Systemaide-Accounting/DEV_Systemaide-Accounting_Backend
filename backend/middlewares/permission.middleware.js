@@ -616,3 +616,80 @@ export const hasDeleteBranch = async (req, res, next) => {
         next(error);
     }
 };
+
+// Transaction Permissions
+export const hasViewAllTransactions = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewAllTransactions")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view all transactions",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasCreateTransaction = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("createTransaction")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to create transaction",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasViewTransactionById = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewTransactionById")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view transaction by id",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasUpdateTransaction = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("updateTransaction")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to update transaction",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasDeleteTransaction = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("deleteTransaction")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to delete transaction",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};

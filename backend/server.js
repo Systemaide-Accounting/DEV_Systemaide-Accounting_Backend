@@ -16,6 +16,7 @@ import permissionRoutes from './routes/permission.route.js';
 import roleRoutes from './routes/role.route.js';
 import locationRoutes from './routes/location.route.js';
 import branchRoutes from './routes/branch.route.js';
+import cashDisbursementTransactionRoutes from './routes/cashDisbursementTransaction.route.js';
 // MIDDLEWARES
 import errorMiddleware from './middlewares/error.middleware.js';
 
@@ -64,6 +65,7 @@ app.use('/api/agent', agentInfoRoutes);
 app.use('/api/chart-of-account', chartOfAccountRoutes);
 app.use('/api/location', locationRoutes);
 app.use('/api/branch', branchRoutes);
+app.use('/api/cash-disbursement', cashDisbursementTransactionRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);

@@ -4,6 +4,6 @@ import { getConnection } from '../controllers/connection.controller.js';
 
 const router = express.Router();
 
-router.get("/", isBearerTokenValid, getConnection);
+router.get("/", getConnection);
 
 export default router;

@@ -34,6 +34,59 @@ const populateSubAccounts = async (account) => {
     return account;
 };
 
+// Helper function to recursively populate subAccounts and filter deleted ones
+// Modified to use lean() for performance and handle potential nulls
+const populateSubsRecursively = async (accountId) => {
+  // Find the account by ID, ensuring it's not deleted
+  // Populate its direct subAccounts, filtering out deleted ones during population
+  // Use lean() to get plain JavaScript objects instead of Mongoose documents
+  const account = await ChartOfAccount.findById(accountId)
+    .populate({
+      path: "subAccounts",
+      match: { isDeleted: { $ne: true } }, // Filter deleted sub-accounts
+      select: "_id", // Initially, we only need the IDs for the next recursive step
+    })
+    .lean(); // Use lean for better performance
+
+  // If the account doesn't exist or is deleted (though initial query should prevent this), return null
+  if (!account || account.isDeleted) {
+    return null;
+  }
+
+  // If there are subAccounts, recursively populate them
+  if (account.subAccounts && account.subAccounts.length > 0) {
+    // Map over the subAccount IDs and recursively call the function
+    const populatedSubTasks = await Promise.all(
+      account.subAccounts.map((subAccount) =>
+        populateSubsRecursively(subAccount._id)
+      )
+    );
+    // Filter out any null results (which would be deleted accounts found deeper in the recursion)
+    account.subAccounts = populatedSubTasks.filter((sub) => sub !== null);
+  } else {
+    // Ensure subAccounts is an empty array if there are none
+    account.subAccounts = [];
+  }
+
+  // Also populate the parentAccount field for the current account, filtering deleted parents
+  // We do this *after* processing subAccounts
+  const populatedAccountWithParents = await ChartOfAccount.findById(account._id)
+      .populate({
+          path: 'parentAccount',
+          match: { isDeleted: { $ne: true } }
+      })
+      .lean();
+
+  if (populatedAccountWithParents) {
+      account.parentAccount = populatedAccountWithParents.parentAccount || [];
+  } else {
+      // Should not happen if account was found initially, but handle defensively
+      account.parentAccount = [];
+  }
+
+  return account;
+};
+
 export const getAllAccounts = async (req, res, next) => {
   try {
     const accounts = await ChartOfAccount.find({ isDeleted: { $ne: true } })
@@ -79,34 +132,25 @@ export const getAllAccounts = async (req, res, next) => {
 
 export const getAllParentAccounts = async (req, res, next) => {
   try {
-    const parentAccounts = await ChartOfAccount.find({
+    // 1. Find top-level parent accounts (not deleted)
+    const topLevelParentAccounts = await ChartOfAccount.find({
       parentAccount: { $size: 0 }, // Find accounts with an empty parentAccount array
       isDeleted: { $ne: true },
-    }).populate({
-      path: "subAccounts", // Populate the direct sub-accounts
-      match: { isDeleted: { $ne: true } }, // Ensure populated sub-accounts are not deleted
-      populate: [
-        // Populate fields within the sub-accounts
-        {
-          path: "parentAccount", // Populate the parent of the sub-account
-          match: { isDeleted: { $ne: true } }, // Ensure the parent isn't deleted
-        },
-        {
-          path: "subAccounts", // Populate the sub-accounts of the sub-account (if needed)
-          match: { isDeleted: { $ne: true } },
-          // You can continue nesting populate here if necessary
-          // populate: { path: 'parentAccount', match: { isDeleted: { $ne: true } } }
-        },
-      ],
-    });
+    }).lean(); // Use lean() for performance
 
-    // Optional: Filter out parent accounts where all subAccounts might have been filtered out by the 'match' clause
-    // const filteredParentAccounts = parentAccounts.filter(account => account.subAccounts.length > 0 || !account.subAccounts); // Or adjust logic as needed
+    // 2. Recursively populate subAccounts for each top-level parent
+    const populatedAccounts = await Promise.all(
+      topLevelParentAccounts.map((parent) => populateSubsRecursively(parent._id))
+    );
+
+    // 3. Filter out any potential nulls (if a top-level parent was somehow deleted between queries)
+    const finalAccounts = populatedAccounts.filter(
+      (account) => account !== null
+    );
 
     res.status(200).json({
       success: true,
-      // data: filteredParentAccounts, // Use if filtering is applied
-      data: parentAccounts, // Use original if no filtering needed
+      data: finalAccounts,
     });
   } catch (error) {
     next(error);

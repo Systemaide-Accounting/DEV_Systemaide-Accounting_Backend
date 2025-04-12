@@ -1,22 +1,6 @@
 import cashReceiptsTransaction from "../models/cashReceiptsTransaction.model.js";
 import mongoose from "mongoose";
-import CryptoJS from "crypto-js";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const secretKey = process.env.CRYPTO_SECRET;
-
-// Encrypt TIN
-const encryptTIN = (tin) => {
-	return CryptoJS.AES.encrypt(tin, secretKey).toString();
-};
-
-// Decrypt TIN
-const decryptTIN = (cipherText) => {
-	const bytes = CryptoJS.AES.decrypt(cipherText, secretKey);
-	return bytes.toString(CryptoJS.enc.Utf8);
-};
+import { encryptTIN, decryptTIN } from "../helpers/encryptDecryptUtils.js";
 
 export const getAllCashReceiptsTransaction = async (req, res, next) => {
 	try {

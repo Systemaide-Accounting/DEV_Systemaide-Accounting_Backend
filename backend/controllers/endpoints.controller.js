@@ -4,8 +4,6 @@ import { app } from "../server.js"; // Import the app instance from server.js
 export const getAllEndpoints = (req, res, next) => {
     try {
         const endpoints = listEndpoints(app);
-        console.log(endpoints);
-        
         res.status(200).json({
             success: true,
             data: endpoints,

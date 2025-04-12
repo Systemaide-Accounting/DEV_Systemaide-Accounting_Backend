@@ -6,6 +6,7 @@ import helmet from "helmet";
 import { connectDB } from "./config/db.js";
 
 // ROUTES
+import endpointsRoutes from "./routes/endpoints.route.js";
 import connectionRoutes from "./routes/connection.route.js";
 import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
@@ -26,7 +27,7 @@ import cookieParser from "cookie-parser";
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware to parse JSON bodies
@@ -69,6 +70,7 @@ app.use("/api/location", locationRoutes);
 app.use("/api/branch", branchRoutes);
 app.use("/api/cash-disbursement", cashDisbursementTransactionRoutes);
 app.use("/api/cash-receipts", cashReceiptsTransactionRoutes);
+app.use("/api/endpoints", endpointsRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);

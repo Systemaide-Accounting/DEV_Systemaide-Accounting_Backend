@@ -9,6 +9,6 @@ router.get("/", isAuthorized, hasViewAllAgents, getAllAgents);
 router.post("/", isAuthorized, hasCreateAgent, createAgent);
 router.get("/:id", isAuthorized, hasViewAgentById, getAgentById);
 router.patch("/:id", isAuthorized, hasUpdateAgent, updateAgent);
-router.patch("/delete/:id", isAuthorized, hasDeleteAgent, deleteAgent);
+router.delete("/delete/:id", isAuthorized, hasDeleteAgent, deleteAgent);
 
 export default router;

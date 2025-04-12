@@ -15,6 +15,6 @@ router.get("/", isAuthorized, hasViewAllCompanies, getAllCompanies);
 router.post("/", isAuthorized, hasCreateCompany, createCompany);
 router.get("/:id", isAuthorized, hasViewCompanyById, getCompanyById);
 router.patch("/:id", isAuthorized, hasUpdateCompany, updateCompany);
-router.patch("/delete/:id", isAuthorized, hasDeleteCompany, deleteCompany);
+router.delete("/delete/:id", isAuthorized, hasDeleteCompany, deleteCompany);
 
 export default router;

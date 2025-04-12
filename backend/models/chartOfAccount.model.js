@@ -26,11 +26,20 @@ const chartOfAccountSchema = mongoose.Schema(
       enum: ["", "debit", "credit"],
       trim: true,
     },
-    parentAccount: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ChartOfAccount",
-      trim: true,
-    },
+    parentAccount: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ChartOfAccount",
+        trim: true,
+      }
+  ],
+    subAccounts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ChartOfAccount",
+        trim: true,
+      },
+    ],
     isDeleted: {
       type: Boolean,
       default: false,

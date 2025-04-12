@@ -41,10 +41,22 @@ const cashDisbursementTransactionSchema = mongoose.Schema(
       required: [true, "Payee Name is required"],
       trim: true,
     },
-    addressTIN: {
+    // addressTIN: {
+    //   type: String,
+    //   required: [true, "Address/TIN is required"],
+    //   maxlength: [255, "Address/TIN cannot exceed 255 characters"],
+    //   trim: true,
+    // },
+    address: {
       type: String,
-      required: [true, "Address/TIN is required"],
-      maxlength: [255, "Address/TIN cannot exceed 255 characters"],
+      required: [true, "Address is required"],
+      maxlength: [255, "Address cannot exceed 255 characters"],
+      trim: true,
+    },
+    tin: {
+      type: String,
+      required: [true, "Tin is required"],
+      maxlength: [255, "Tin cannot exceed 255 characters"],
       trim: true,
     },
     cashAccount: {

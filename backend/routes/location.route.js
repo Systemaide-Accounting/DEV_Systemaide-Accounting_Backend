@@ -9,6 +9,6 @@ router.get('/', isAuthorized, hasViewAllLocations, getAllLocations);
 router.post('/', isAuthorized, hasCreateLocation, createLocation);
 router.get('/:id', isAuthorized, hasViewLocationById, getLocationById);
 router.patch('/:id', isAuthorized, hasUpdateLocation, updateLocation);
-router.patch('/delete/:id', isAuthorized, hasDeleteLocation, deleteLocation);
+router.delete("/delete/:id", isAuthorized, hasDeleteLocation, deleteLocation);
 
 export default router;

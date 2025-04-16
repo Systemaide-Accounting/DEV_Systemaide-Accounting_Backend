@@ -15,6 +15,7 @@ export const getAllSalesOnAccount = async (req, res, next) => {
         //       tin: tx.tin ? decryptTIN(tx.tin) : "",
         //     };
         // });
+
         transactions = transactions.map((tx) => {
           const txObj = tx.toObject();
           try {
@@ -103,6 +104,7 @@ export const getSalesOnAccountById = async (req, res, next) => {
 export const updateSalesOnAccount = async (req, res, next) => {
     try {
         const { id: transactionId } = req.params;
+        const transactionBody = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(transactionId)) {
             return res.status(404).json({
@@ -121,15 +123,19 @@ export const updateSalesOnAccount = async (req, res, next) => {
             });
         }
 
+        if(transaction?.tin) {
+            transactionBody.tin = encryptTIN(transactionBody.tin);
+        }
+
         // Update the transaction
         const updatedTransaction = await SalesOnAccount.findByIdAndUpdate(
             transactionId,
-            { ...req.body },
+            transactionBody,
             { new: true, runValidators: true }
         );
 
         // Decrypt TIN
-        updatedTransaction.tin = decryptTIN(updatedTransaction.tin);
+        updatedTransaction.tin = decryptTIN(updatedTransaction?.tin);
 
         res.status(200).json({
             success: true,

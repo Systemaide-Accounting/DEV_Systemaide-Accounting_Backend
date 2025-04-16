@@ -13,7 +13,8 @@ export const getAllCashReceiptsTransaction = async (req, res, next) => {
 		transactions = transactions.map((tx) => {
 			return {
 				...tx.toObject(),
-				tin: decryptTIN(tx.tin),
+				// tin: decryptTIN(tx.tin),
+				tin: tx.tin ? decryptTIN(tx.tin) : "",
 			};
 		});
 

@@ -1,6 +1,7 @@
 import Branch from "../models/branch.model.js";
 import Location from "../models/location.model.js";
 import mongoose from "mongoose";
+import { encryptTIN, decryptTIN } from "../helpers/encryptDecryptUtils.js";
 
 const isBranchDeleted = async (branch) => {
     const deletedBranch = await Branch.findOne({ _id: branch?._id, isDeleted: true });
@@ -24,6 +25,24 @@ export const getAllLocations = async (req, res, next) => {
           if (location?.branch && location.branch?.isDeleted) {
             location.branch = null;
           }
+        });
+
+        // Decrypt TIN if needed
+        locations = locations.map((location) => {
+          const locationObj = location.toObject();
+          try {
+            // Only attempt to decrypt if tin exists and is not empty
+            if (locationObj.tin) {
+              locationObj.tin = decryptTIN(locationObj.tin);
+            }
+          } catch (decryptError) {
+            console.error(
+              `Failed to decrypt TIN for transaction ${locationObj._id}:`,
+              decryptError.message
+            );
+            locationObj.tin = ""; // Set to empty string on decryption failure
+            }
+          return locationObj;
         });
 
         res.status(200).json({
@@ -61,6 +80,11 @@ export const createLocation = async (req, res, next) => {
           }
         } else {
           delete location.branch;
+        }
+
+        // Encrypt TIN before saving
+        if (location?.tin) {
+          location.tin = encryptTIN(location.tin);
         }
 
         let newLocation = await Location.create(location);
@@ -110,7 +134,10 @@ export const getLocationById = async (req, res, next) => {
 
         res.status(200).json({
           success: true,
-          data: location,
+          data: {
+            ...location.toObject(),
+            tin: decryptTIN(location.tin), // Decrypt TIN before sending response
+          },
         });
     } catch (error) {
         next(error);
@@ -155,6 +182,11 @@ export const updateLocation = async (req, res, next) => {
           }
         } else {
           location.branch = null;
+        }
+
+        // Encrypt TIN before saving
+        if (location?.tin) {
+          location.tin = encryptTIN(location.tin);
         }
 
         const updatedLocation = await Location.findOneAndUpdate(

@@ -10,8 +10,9 @@ export const getAllSalesOnAccount = async (req, res, next) => {
         // Decrypt TINs
         transactions = transactions.map((tx) => {
             return {
-                ...tx.toObject(),
-                tin: decryptTIN(tx.tin),
+              ...tx.toObject(),
+              // tin: decryptTIN(tx.tin),
+              tin: tx.tin ? decryptTIN(tx.tin) : "",
             };
         });
 

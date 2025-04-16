@@ -8,6 +8,6 @@ router.get('/', isAuthorized, hasViewAllBranches, getAllBranches);
 router.get('/:id', isAuthorized, hasViewBranchById, getBranchById);
 router.post('/', isAuthorized, hasCreateBranch, createBranch);
 router.patch('/:id', isAuthorized, hasUpdateBranch, updateBranch);
-router.patch("/delete/:id", isAuthorized, hasDeleteBranch, deleteBranch);
+router.delete("/delete/:id", isAuthorized, hasDeleteBranch, deleteBranch);
 
 export default router;

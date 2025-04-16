@@ -15,6 +15,6 @@ router.get("/", isAuthorized, hasViewAllTransactions, getAllCashDisbursementTran
 router.post("/", isAuthorized, hasCreateTransaction, createCashDisbursementTransaction);
 router.get("/:id", isAuthorized, hasViewTransactionById, getCashDisbursementTransactionById);
 router.patch("/:id", isAuthorized, hasUpdateTransaction, updateCashDisbursementTransaction);
-router.patch("/delete/:id", isAuthorized, hasDeleteTransaction, deleteCashDisbursementTransaction);
+router.delete("/delete/:id", isAuthorized, hasDeleteTransaction, deleteCashDisbursementTransaction);
 
 export default router;

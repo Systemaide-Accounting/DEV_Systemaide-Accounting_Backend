@@ -20,7 +20,7 @@ const isAgentCodeExisting = async (agent) => {
 
 export const getAllAgents = async (req, res, next) => {
     try {
-        const agentInfos = await AgentInfo.find({ isDeleted: { $ne: true } });
+        let agentInfos = await AgentInfo.find({ isDeleted: { $ne: true } });
 
         // Decrypt TINs
         agentInfos = agentInfos.map((agent) => {

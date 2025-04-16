@@ -18,7 +18,7 @@ const isLocationTINExisting = async (location) => {
 
 export const getAllLocations = async (req, res, next) => {
     try {
-        const locations = await Location.find({ isDeleted: { $ne: true } }).populate("branch");
+        let locations = await Location.find({ isDeleted: { $ne: true } }).populate("branch");
       
         // check if branch is deleted
         locations.forEach(async (location) => {

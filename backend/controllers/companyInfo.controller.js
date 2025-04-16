@@ -39,7 +39,7 @@ export const getLatestCompany = async (req, res, next) => {
 
 export const getAllCompanies = async (req, res, next) => {
  try {
-    const companyInfos = await CompanyInfo.find({ isDeleted: { $ne: true } });
+    let companyInfos = await CompanyInfo.find({ isDeleted: { $ne: true } });
     
     // Decrypt TINs
     companyInfos.map((company) => {

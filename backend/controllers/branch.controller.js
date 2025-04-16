@@ -12,7 +12,7 @@ const isBranchTINExisting = async (branch) => {
 
 export const getAllBranches = async (req, res, next) => {
     try {
-        const branches = await Branch.find({ isDeleted: { $ne: true } });
+        let branches = await Branch.find({ isDeleted: { $ne: true } });
 
         // Decrypt TINs
         branches = branches.map((branch) => {

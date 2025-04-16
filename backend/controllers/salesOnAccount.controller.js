@@ -4,39 +4,40 @@ import { encryptTIN, decryptTIN } from "../helpers/encryptDecryptUtils.js";
 
 export const getAllSalesOnAccount = async (req, res, next) => {
     try {
-        let transactions = await SalesOnAccount.find({ isDeleted: { $ne: true } })
-            .populate("location")
+      let transactions = await SalesOnAccount.find({
+        isDeleted: { $ne: true },
+      }).populate("location");
 
-        // Decrypt TINs
-        // transactions = transactions.map((tx) => {
-        //     return {
-        //       ...tx.toObject(),
-        //       // tin: decryptTIN(tx.tin),
-        //       tin: tx.tin ? decryptTIN(tx.tin) : "",
-        //     };
-        // });
-
-        transactions = transactions.map((tx) => {
-          const txObj = tx.toObject();
-          try {
-            // Only attempt to decrypt if tin exists and is not empty
-            if (txObj.tin) {
-              txObj.tin = decryptTIN(txObj.tin);
-            }
-          } catch (decryptError) {
-            console.error(
-              `Failed to decrypt TIN for transaction ${txObj._id}:`,
-              decryptError.message
-            );
-            txObj.tin = ""; // Set to empty string on decryption failure
+      // Decrypt TINs
+      // transactions = transactions.map((tx) => {
+      //     return {
+      //       ...tx.toObject(),
+      //       // tin: decryptTIN(tx.tin),
+      //       tin: tx.tin ? decryptTIN(tx.tin) : "",
+      //     };
+      // });
+      // Decrypt TINs
+      transactions = transactions.map((tx) => {
+        const txObj = tx.toObject();
+        try {
+          // Only attempt to decrypt if tin exists and is not empty
+          if (txObj.tin) {
+            txObj.tin = decryptTIN(txObj.tin);
           }
-          return txObj;
-        });
+        } catch (decryptError) {
+          console.error(
+            `Failed to decrypt TIN for transaction ${txObj._id}:`,
+            decryptError.message
+          );
+          txObj.tin = ""; // Set to empty string on decryption failure
+        }
+        return txObj;
+      });
 
-        res.status(200).json({
-            success: true,
-            data: transactions,
-        });
+      res.status(200).json({
+        success: true,
+        data: transactions,
+      });
     } catch (error) {
         next(error);
     }

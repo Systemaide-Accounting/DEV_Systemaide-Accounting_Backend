@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Branch from "../models/branch.model.js";
+import { encryptTIN, decryptTIN } from "../helpers/encryptDecryptUtils.js";
 
 const isBranchTINExisting = async (branch) => {
     const existingBranch = await Branch.findOne({
@@ -11,7 +12,26 @@ const isBranchTINExisting = async (branch) => {
 
 export const getAllBranches = async (req, res, next) => {
     try {
-        const branches = await Branch.find({ isDeleted: { $ne: true } });
+        let branches = await Branch.find({ isDeleted: { $ne: true } });
+
+        // Decrypt TINs
+        branches = branches.map((branch) => {
+          const branchObj = branch.toObject();
+          try {
+            // Only attempt to decrypt if tin exists and is not empty
+            if (branchObj.tin) {
+              branchObj.tin = decryptTIN(branchObj.tin);
+            }
+          } catch (decryptError) {
+            console.error(
+              `Failed to decrypt TIN for transaction ${branchObj._id}:`,
+              decryptError.message
+            );
+            branchObj.tin = ""; // Set to empty string on decryption failure
+          }
+          return branchObj;
+        });
+
         res.status(200).json({
             success: true,
             data: branches,
@@ -36,6 +56,11 @@ export const createBranch = async (req, res, next) => {
                 success: false,
                 message: "Branch TIN already exists",
             });
+        }
+
+        // Encrypt TIN before saving
+        if (branch?.tin) {
+            branch.tin = encryptTIN(branch.tin);
         }
 
         const newBranch = await Branch.create(branch);
@@ -74,7 +99,10 @@ export const getBranchById = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            data: branch,
+            data: {
+                ...branch.toObject(),
+                tin: decryptTIN(branch.tin), // Decrypt TIN before sending response
+            },
         });
     } catch (error) {
         next(error);
@@ -108,6 +136,11 @@ export const updateBranch = async (req, res, next) => {
                 success: false,
                 message: "Branch TIN already exists",
             });
+        }
+
+        // Encrypt TIN before saving
+        if (branch?.tin) {
+            branch.tin = encryptTIN(branch.tin);
         }
 
         const updatedBranch = await Branch.findOneAndUpdate(

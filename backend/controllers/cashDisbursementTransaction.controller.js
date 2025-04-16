@@ -13,10 +13,20 @@ export const getAllCashDisbursementTransactions = async (req, res, next) => {
 
         cashDisbursementTransactions = cashDisbursementTransactions.map(
           (tx) => {
-            return {
-              ...tx.toObject(),
-              tin: decryptTIN(tx.tin),
-            };
+            const txObj = tx.toObject();
+            try {
+              // Only attempt to decrypt if tin exists and is not empty
+              if (txObj.tin) {
+                txObj.tin = decryptTIN(txObj.tin);
+              }
+            } catch (decryptError) {
+              console.error(
+                `Failed to decrypt TIN for transaction ${txObj._id}:`,
+                decryptError.message
+              );
+              txObj.tin = ""; // Set to empty string on decryption failure
+            }
+            return txObj;
           }
         );
 
@@ -109,7 +119,7 @@ export const updateCashDisbursementTransaction = async (req, res, next) => {
             });
         }
 
-        if (transaction.tin) {
+        if (transaction?.tin) {
             transaction.tin = encryptTIN(transaction.tin);
         }
 

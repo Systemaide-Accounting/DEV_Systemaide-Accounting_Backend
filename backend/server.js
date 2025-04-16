@@ -74,12 +74,8 @@ app.use("/api/cash-disbursement", cashDisbursementTransactionRoutes);
 app.use("/api/cash-receipts", cashReceiptsTransactionRoutes);
 app.use("/api/sales-on-account", salesOnAccountRoutes);
 app.use("/api/endpoints", endpointsRoutes);
-<<<<<<< HEAD
 app.use("/api/general-journal", generalJournalRoutes);
-=======
-app.use("/api/endpoints", endpointsRoutes);
 
->>>>>>> 90263776e720d7824989edc8264fc2b7c74abb92
 
 // Error handling middleware
 app.use(errorMiddleware);

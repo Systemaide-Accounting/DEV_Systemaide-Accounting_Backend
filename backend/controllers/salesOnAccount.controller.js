@@ -8,11 +8,28 @@ export const getAllSalesOnAccount = async (req, res, next) => {
             .populate("location")
 
         // Decrypt TINs
+        // transactions = transactions.map((tx) => {
+        //     return {
+        //       ...tx.toObject(),
+        //       // tin: decryptTIN(tx.tin),
+        //       tin: tx.tin ? decryptTIN(tx.tin) : "",
+        //     };
+        // });
         transactions = transactions.map((tx) => {
-            return {
-                ...tx.toObject(),
-                tin: decryptTIN(tx.tin),
-            };
+          const txObj = tx.toObject();
+          try {
+            // Only attempt to decrypt if tin exists and is not empty
+            if (txObj.tin) {
+              txObj.tin = decryptTIN(txObj.tin);
+            }
+          } catch (decryptError) {
+            console.error(
+              `Failed to decrypt TIN for transaction ${txObj._id}:`,
+              decryptError.message
+            );
+            txObj.tin = ""; // Set to empty string on decryption failure
+          }
+          return txObj;
         });
 
         res.status(200).json({

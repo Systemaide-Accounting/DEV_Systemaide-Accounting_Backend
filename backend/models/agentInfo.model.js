@@ -11,7 +11,7 @@ const agentInfoSchema = mongoose.Schema(
     tin: {
       type: String,
       required: [true, "TIN is required"],
-      maxlength: [20, "TIN cannot exceed 20 characters"],
+      maxlength: [255, "TIN cannot exceed 20 characters"],
       trim: true,
     },
     taxClassification: {

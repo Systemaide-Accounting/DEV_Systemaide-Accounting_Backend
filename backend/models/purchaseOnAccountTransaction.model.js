@@ -7,6 +7,16 @@ const purchaseOnAccountTransactionSchema = mongoose.Schema(
       required: [true, "Date is required"],
       default: Date.now,
     },
+    month: {
+      type: String,
+      required: [true, "Month is required"],
+      trim: true,
+    },
+    year: {
+      type: String,
+      required: [true, "Year is required"],
+      trim: true,
+    },
     location: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Location",

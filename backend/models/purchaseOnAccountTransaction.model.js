@@ -41,40 +41,10 @@ const purchaseOnAccountTransactionSchema = mongoose.Schema(
     },
 
     // B. Transaction Template
-    purchaseType: {
-      type: String,
-      required: [true, "Purchase Type is required"],
-      enum: ["12% VAT", "Zero-Rated", "VAT Exempt", "Non-VAT"],
-    },
-    inventoryAccount: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ChartOfAccount",
-      required: [true, "Inventory Account is required"],
-    },
-    grossAmount: {
-      type: Number,
-      required: [true, "Gross Amount is required"],
-      min: [0, "Gross Amount cannot be negative"],
-    },
-    netAmount: {
-      type: Number,
-      min: [0, "Net Amount cannot be negative"],
-    },
-    inputTax: {
-      type: Number,
-      min: [0, "Input Tax cannot be negative"],
-      default: 0,
-    },
-    withholdingTax: {
-      type: Number,
-      min: [0, "Withholding Tax cannot be negative"],
-      default: 0,
-    },
-    atcCode: {
-      type: String,
-      maxlength: [50, "ATC Code cannot exceed 50 characters"],
-      trim: true,
-    },
+		transactionLines: {
+			type: String,
+			trim: true,
+		},
 
     // System/Soft Delete Fields
     isDeleted: {

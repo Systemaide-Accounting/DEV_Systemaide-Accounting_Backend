@@ -20,7 +20,7 @@ const generalJournalSchema = mongoose.Schema(
 		location: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Location",
-			required: [true, "Location is required"],
+			// required: [true, "Location is required"],
 			trim: true,
 		},
 		jvNo: {

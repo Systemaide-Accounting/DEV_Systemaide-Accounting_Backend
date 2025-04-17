@@ -28,6 +28,12 @@ const purchaseOnAccountTransactionSchema = mongoose.Schema(
       maxlength: [50, "PV No cannot exceed 50 characters"],
       trim: true,
     },
+    invoiceNo: {
+      type: String,
+      required: [true, "Invoice No is required"],
+      maxlength: [50, "Invoice No cannot exceed 50 characters"],
+      trim: true,
+    },
     supplierName: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "AgentInfo",

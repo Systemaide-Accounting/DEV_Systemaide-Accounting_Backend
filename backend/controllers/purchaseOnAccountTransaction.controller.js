@@ -1,49 +1,34 @@
-import CashDisbursementTransaction from "../models/cashDisbursementTransaction.model.js";
+import PurchaseOnAccountTransaction from "../models/purchaseOnAccountTransaction.model.js";
+import AgentInfo from "../models/agentInfo.model.js";
 import mongoose from "mongoose";
 import { encryptTIN, decryptTIN } from "../helpers/encryptDecryptUtils.js";
 
-export const getAllCashDisbursementTransactions = async (req, res, next) => {
+export const getAllPurchaseOnAccountTransactions = async (req, res, next) => {
     try {
-        let cashDisbursementTransactions = await CashDisbursementTransaction.find({
+        let transactions = await PurchaseOnAccountTransaction.find({
             isDeleted: { $ne: true },
         })
             .populate("location")
-            .populate("payeeName")
-            .populate("cashAccount");
+            .populate("supplierName");
 
-        cashDisbursementTransactions = cashDisbursementTransactions.map(
-          (tx) => {
-            const txObj = tx.toObject();
-            try {
-              // Only attempt to decrypt if tin exists and is not empty
-              if (txObj.tin) {
-                txObj.tin = decryptTIN(txObj.tin);
-              }
-            } catch (decryptError) {
-              console.error(
-                `Failed to decrypt TIN for transaction ${txObj._id}:`,
-                decryptError.message
-              );
-              txObj.tin = ""; // Set to empty string on decryption failure
-            }
-            return txObj;
-          }
-        );
+        transactions = transactions.map((tx) => ({
+            ...tx.toObject(),
+            tin: decryptTIN(tx.tin),
+        }));
 
         res.status(200).json({
             success: true,
-            data: cashDisbursementTransactions,
+            data: transactions,
         });
     } catch (error) {
         next(error);
     }
 };
 
-export const createCashDisbursementTransaction = async (req, res, next) => {
+export const createPurchaseOnAccountTransaction = async (req, res, next) => {
     try {
         const transaction = { ...req.body };
 
-        // Remove restricted fields
         delete transaction.isDeleted;
         delete transaction.deletedAt;
 
@@ -51,7 +36,7 @@ export const createCashDisbursementTransaction = async (req, res, next) => {
             transaction.tin = encryptTIN(transaction.tin);
         }
 
-        const newTransaction = await CashDisbursementTransaction.create(transaction);
+        const newTransaction = await PurchaseOnAccountTransaction.create(transaction);
 
         res.status(201).json({
             success: true,
@@ -65,7 +50,7 @@ export const createCashDisbursementTransaction = async (req, res, next) => {
     }
 };
 
-export const getCashDisbursementTransactionById = async (req, res, next) => {
+export const getPurchaseOnAccountTransactionById = async (req, res, next) => {
     try {
         const { id: transactionId } = req.params;
 
@@ -76,13 +61,12 @@ export const getCashDisbursementTransactionById = async (req, res, next) => {
             });
         }
 
-        const transaction = await CashDisbursementTransaction.findOne({
+        const transaction = await PurchaseOnAccountTransaction.findOne({
             _id: transactionId,
             isDeleted: { $ne: true },
         })
             .populate("location")
-            .populate("payeeName")
-            .populate("cashAccount");
+            .populate("supplierName");
 
         if (!transaction) {
             return res.status(404).json({
@@ -103,12 +87,11 @@ export const getCashDisbursementTransactionById = async (req, res, next) => {
     }
 };
 
-export const updateCashDisbursementTransaction = async (req, res, next) => {
+export const updatePurchaseOnAccountTransaction = async (req, res, next) => {
     try {
         const { id: transactionId } = req.params;
         const transaction = { ...req.body };
 
-        // Remove restricted fields
         delete transaction.isDeleted;
         delete transaction.deletedAt;
 
@@ -119,11 +102,11 @@ export const updateCashDisbursementTransaction = async (req, res, next) => {
             });
         }
 
-        if (transaction?.tin) {
+        if (transaction.tin) {
             transaction.tin = encryptTIN(transaction.tin);
         }
 
-        const updatedTransaction = await CashDisbursementTransaction.findOneAndUpdate(
+        const updatedTransaction = await PurchaseOnAccountTransaction.findOneAndUpdate(
             { _id: transactionId, isDeleted: { $ne: true } },
             transaction,
             { new: true, runValidators: true }
@@ -148,7 +131,7 @@ export const updateCashDisbursementTransaction = async (req, res, next) => {
     }
 };
 
-export const deleteCashDisbursementTransaction = async (req, res, next) => {
+export const deletePurchaseOnAccountTransaction = async (req, res, next) => {
     try {
         const { id: transactionId } = req.params;
 
@@ -159,13 +142,12 @@ export const deleteCashDisbursementTransaction = async (req, res, next) => {
             });
         }
 
-        const deletedTransaction =
-          await CashDisbursementTransaction.findOneAndUpdate(
+        const deletedTransaction = await PurchaseOnAccountTransaction.findOneAndUpdate(
             { _id: transactionId, isDeleted: { $ne: true } },
             { isDeleted: true, deletedAt: new Date() },
             { new: true, runValidators: true }
-          );
-        
+        );
+
         if (!deletedTransaction) {
             return res.status(404).json({
                 success: false,
@@ -181,4 +163,3 @@ export const deleteCashDisbursementTransaction = async (req, res, next) => {
         next(error);
     }
 };
-

@@ -4,10 +4,10 @@ import { getCashDisbursementTransactionReport, getCashReceiptsTransactionReport,
 import { hasViewJournalReport } from "../middlewares/permission.middleware.js";
 const router = express.Router();
 
-router.post( "/cash-disbursement", isAuthorized, getCashDisbursementTransactionReport );
-router.post( "/cash-receipts", isAuthorized, getCashReceiptsTransactionReport );
-router.post( "/sales-on-account", isAuthorized, getSalesOnAccountReport );
-router.post( "/purchase-on-account", isAuthorized, getPurchaseOnAccountReport );
-router.post( "/general-journal", isAuthorized, getGeneralJournalReport);
+router.post( "/cash-disbursement", isAuthorized, hasViewJournalReport, getCashDisbursementTransactionReport );
+router.post( "/cash-receipts", isAuthorized, hasViewJournalReport, getCashReceiptsTransactionReport );
+router.post( "/sales-on-account", isAuthorized, hasViewJournalReport, getSalesOnAccountReport );
+router.post( "/purchase-on-account", isAuthorized, hasViewJournalReport, getPurchaseOnAccountReport );
+router.post( "/general-journal", isAuthorized, hasViewJournalReport, getGeneralJournalReport);
 
 export default router;

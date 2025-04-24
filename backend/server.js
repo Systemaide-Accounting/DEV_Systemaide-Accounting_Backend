@@ -78,7 +78,7 @@ app.use("/api/sales-on-account", salesOnAccountRoutes);
 app.use("/api/purchase-on-account", purchaseOnAccountTransactionRoutes);
 app.use("/api/endpoints", endpointsRoutes);
 app.use("/api/general-journal", generalJournalRoutes);
-app.use("/api/report", reportRoutes);
+app.use("/api/reports", reportRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);

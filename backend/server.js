@@ -22,6 +22,7 @@ import cashReceiptsTransactionRoutes from "./routes/cashReceiptsTransaction.rout
 import salesOnAccountRoutes from "./routes/salesOnAccount.route.js";
 import generalJournalRoutes from "./routes/generalJournal.route.js";
 import purchaseOnAccountTransactionRoutes from "./routes/purchaseOnAccountTransaction.route.js";
+import reportRoutes from "./routes/report.route.js";
 
 // MIDDLEWARES
 import errorMiddleware from "./middlewares/error.middleware.js";
@@ -74,10 +75,10 @@ app.use("/api/branch", branchRoutes);
 app.use("/api/cash-disbursement", cashDisbursementTransactionRoutes);
 app.use("/api/cash-receipts", cashReceiptsTransactionRoutes);
 app.use("/api/sales-on-account", salesOnAccountRoutes);
-app.use("/api/purchase-on-account", purchaseOnAccountTransactionRoutes); 
+app.use("/api/purchase-on-account", purchaseOnAccountTransactionRoutes);
 app.use("/api/endpoints", endpointsRoutes);
 app.use("/api/general-journal", generalJournalRoutes);
-
+app.use("/api/report", reportRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);

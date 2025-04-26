@@ -32,12 +32,15 @@ export const getCashDisbursementTransactionReport = async (req, res, next) => {
 		}
 
 		const transactions = await CashDisbursementTransaction.find({
-			date: {
-				$gte: new Date(startDate),
-				$lte: new Date(endDate),
-			},
-			isDeleted: { $ne: true },
-		}).populate("location");
+		date: {
+			$gte: new Date(startDate),
+			$lte: new Date(endDate),
+		},
+		isDeleted: { $ne: true },
+		})
+		.populate("location")
+		.populate("payeeName")
+		.populate("cashAccount");
 
 		// Decrypt TINs
 		const decryptedTransactions = transactions.map((tx) => {

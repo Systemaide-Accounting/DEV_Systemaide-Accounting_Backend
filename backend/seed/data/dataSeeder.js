@@ -13,6 +13,12 @@ import Branch from "../../models/branch.model.js";
 import Location from "../../models/location.model.js";
 import User from "../../models/user.model.js";
 import GeneralJournal from "../../models/generalJournal.model.js";
+import AgentInfo from "../../models/agentInfo.model.js";
+import ChartOfAccount from "../../models/chartOfAccount.model.js";
+import CashDisbursementTransaction from "../../models/cashDisbursementTransaction.model.js";
+import CashReceiptsTransaction from "../../models/cashReceiptsTransaction.model.js";
+import PurchaseOnAccountTransaction from "../../models/purchaseOnAccountTransaction.model.js";
+import SalesOnAccount from "../../models/salesOnAccount.model.js";
 
 // Configure environment variables
 dotenv.config();
@@ -28,32 +34,30 @@ const modelMap = {
   "Location": Location,
   "User": User,
   "GeneralJournal": GeneralJournal,
-  // Add other models here
-};
-
-// Load models dynamically
-const loadModels = async () => {
-  try {
-    const modelFiles = fs
-      .readdirSync(modelsDir)
-      .filter((file) => file.endsWith(".model.js"));
-
-    console.log(colors.yellow(`Found ${modelFiles.length} model files`));
-
-    // Import all models
-    for (const file of modelFiles) {
-      const modelPath = `../../models/${file}`;
-      await import(modelPath);
-      console.log(colors.green(`Loaded model from ${file}`));
-    }
-  } catch (error) {
-    console.error(colors.red(`Error loading models: ${error.message}`));
-    process.exit(1);
-  }
+  "AgentInfo": AgentInfo,
+  "ChartOfAccount": ChartOfAccount,
+  "CashDisbursementTransaction": CashDisbursementTransaction,
+  "CashReceiptsTransaction": CashReceiptsTransaction,
+  "GeneralJournal": GeneralJournal,
+  "PurchaseOnAccountTransaction": PurchaseOnAccountTransaction,
+  "SalesOnAccount": SalesOnAccount,
 };
 
 // Dynamic data generators for models
-const generateData = (modelName, count = 5) => {
+const generateData = async (modelName, count = 5) => {
+  
+  // Fetch Branch IDs from the database
+  const branchIds = await mongoose.model("Branch").find({}, "_id").lean();
+  // Fetch Location IDs from the database
+  const locationIds = await mongoose.model("Location").find({}, "_id").lean();
+  // Fetch AgentInfo IDs from the database
+  const agentIds = await mongoose.model("AgentInfo").find({}, "_id").lean();
+  // Fetch ChartOfAccount IDs from the database
+  const chartOfAccountIds = await mongoose
+    .model("ChartOfAccount")
+    .find({}, "_id")
+    .lean();
+
   switch (modelName) {
     case "Branch":
       return Array.from({ length: count }).map(() => ({
@@ -63,21 +67,221 @@ const generateData = (modelName, count = 5) => {
         machineId: faker.string.alphanumeric(10),
       }));
 
-    // case "Location":
-    //   return Array.from({ length: count }).map(() => ({
-    //     name: faker.location.city(),
-    //     address: faker.location.streetAddress(),
-    //     contactPerson: faker.person.fullName(),
-    //     contactNumber: faker.phone.number(),
-    //   }));
+    case "Location":
+      if (branchIds?.length === 0) {
+        console.warn(
+          colors.yellow(
+            "No Branch records found. Please seed Branch data first."
+          )
+        );
+        console.warn(colors.yellow("Run: npm run seed:data Branch"));
+        throw new Error("Location records require Branch references");
+      }
 
-    // case "User":
-    //   return Array.from({ length: count }).map(() => ({
-    //     name: faker.person.fullName(),
-    //     email: faker.internet.email(),
-    //     password: faker.internet.password({ length: 10 }),
-    //     role: faker.helpers.arrayElement(["admin", "user", "manager"]),
-    //   }));
+      return Array.from({ length: count }).map(() => ({
+        name: faker.location.city(),
+        address: faker.location.streetAddress(),
+        tin: encryptTIN(faker.string.numeric(12)),
+        machineId: faker.string.alphanumeric(10),
+        branch: faker.helpers.arrayElement(branchIds)._id,
+      }));
+
+    case "AgentInfo":
+      return Array.from({ length: count }).map(() => ({
+        agentCode: faker.string.numeric(10),
+        tin: encryptTIN(faker.string.numeric(12)),
+        taxClassification: faker.helpers.arrayElement([
+          "individual",
+          "non-individual",
+        ]),
+        registeredName: faker.company.name(),
+        agentName: faker.person.fullName(),
+        tradeName: faker.company.name(),
+        agentType: faker.helpers.arrayElement([
+          "customer",
+          "supplier",
+          "government-agency",
+          "employee",
+          "others",
+        ]),
+        registrationType: faker.helpers.arrayElement(["vat", "non-vat"]),
+        authorizedRepresentative: faker.person.fullName(),
+        agentAddress: faker.location.streetAddress(),
+        email: faker.internet.email(),
+        phone: faker.phone.number(),
+        fax: faker.string.numeric(5),
+        website: faker.internet.url(),
+      }));
+
+    case "ChartOfAccount":
+      return Array.from({ length: count }).map(() => ({
+        accountCode: faker.string.numeric(10),
+        accountName: faker.finance.accountName(),
+        accountType: faker.helpers.arrayElement([
+          "",
+          "asset",
+          "liability",
+          "equity",
+          "revenue",
+          "expense",
+        ]),
+        normalBalance: faker.helpers.arrayElement(["", "debit", "credit"]),
+      }));
+
+    case "CashDisbursementTransaction":
+      if (
+        locationIds?.length === 0 ||
+        agentIds?.length === 0 ||
+        chartOfAccountIds?.length === 0
+      ) {
+        console.warn(
+          colors.yellow(
+            "No Location, AgentInfo, OR ChartOfAccount records found. Please seed these data first."
+          )
+        );
+        console.warn(colors.yellow("Run: npm run seed:data Location"));
+        console.warn(colors.yellow("Run: npm run seed:data AgentInfo"));
+        console.warn(colors.yellow("Run: npm run seed:data ChartOfAccount"));
+        throw new Error(
+          "CashDisbursementTransaction records require Location, AgentInfo, and ChartOfAccount references"
+        );
+      }
+
+      return Array.from({ length: count }).map(() => {
+        // Generate a random date
+        const date = faker.date.recent();
+
+        return {
+          date,
+          // get name of the month from date
+          month: date.toLocaleString("default", { month: "long" }),
+          // Convert the current year to a string
+          year: date.getFullYear().toString(),
+          location: faker.helpers.arrayElement(locationIds)._id,
+          cvNo: `CV-${faker.string.numeric(6)}`,
+          checkNo: `${faker.string.numeric(6)}`,
+          payeeName: faker.helpers.arrayElement(agentIds)._id,
+          address: faker.location.streetAddress(),
+          tin: encryptTIN(faker.string.numeric(12)),
+          cashAccount: faker.helpers.arrayElement(chartOfAccountIds)._id,
+          particular: faker.finance.transactionDescription(),
+        };
+      });
+
+    case "CashReceiptsTransaction":
+      if (
+        locationIds?.length === 0 ||
+        chartOfAccountIds?.length === 0
+      ) {
+        console.warn(
+          colors.yellow(
+            "No Location OR ChartOfAccount records found. Please seed these data first."
+          )
+        );
+        console.warn(colors.yellow("Run: npm run seed:data Location"));
+        console.warn(colors.yellow("Run: npm run seed:data ChartOfAccount"));
+        throw new Error(
+          "CashDisbursementTransaction records require Location and ChartOfAccount references"
+        );
+      }
+
+      return Array.from({ length: count }).map(() => {
+        // Generate a random date
+        const date = faker.date.recent();
+        return {
+          date,
+          // get name of the month from date
+          month: date.toLocaleString("default", { month: "long" }),
+          year: date.getFullYear().toString(),
+          location: faker.helpers.arrayElement(locationIds)._id,
+          orNo: `OR-${faker.string.numeric(6)}`,
+          payorName: faker.person.fullName(),
+          address: faker.location.streetAddress(),
+          tin: encryptTIN(faker.string.numeric(12)),
+          cashAccount: faker.helpers.arrayElement(chartOfAccountIds)._id,
+          cashAmount: Number(
+            faker.number
+              .float({
+                min: 10,
+                max: 10000,
+                precision: 0.01,
+              })
+              .toFixed(2)
+          ),
+          particular: faker.finance.transactionDescription(),
+        };
+      });
+
+    case "GeneralJournal":
+      if (locationIds?.length === 0) {
+        console.warn(colors.yellow("No Location records found. Please seed Location data first."));
+        console.warn(colors.yellow("Run: npm run seed:data Location"));
+        throw new Error("GeneralJournal records require Location references");
+      }
+
+      return Array.from({ length: count }).map(() => {
+        const date = faker.date.recent();
+        return {
+          date,
+          month: date.toLocaleString("default", { month: "long" }),
+          year: date.getFullYear().toString(),
+          location: faker.helpers.arrayElement(locationIds)._id,
+          jvNo: `JV-${faker.string.numeric(6)}`,
+          particular: faker.finance.transactionDescription(),
+        };
+      });
+
+    case "PurchaseOnAccountTransaction":
+      if (locationIds?.length === 0 || agentIds?.length === 0) {
+        console.warn(
+          colors.yellow(
+            "No Location OR AgentInfo records found. Please seed these data first."
+          )
+        );
+        console.warn(colors.yellow("Run: npm run seed:data Location"));
+        console.warn(colors.yellow("Run: npm run seed:data AgentInfo"));
+        throw new Error(
+          "PurchaseOnAccountTransaction records require Location and AgentInfo references"
+        );
+      }
+
+      return Array.from({ length: count }).map(() => {
+        const date = faker.date.recent();
+        return {
+          date,
+          month: date.toLocaleString("default", { month: "long" }),
+          year: date.getFullYear().toString(),
+          location: faker.helpers.arrayElement(locationIds)._id,
+          pvNo: `PV-${faker.string.numeric(6)}`,
+          invoiceNo: `INV-${faker.string.numeric(6)}`,
+          supplierName: faker.helpers.arrayElement(agentIds)._id,
+          address: faker.location.streetAddress(),
+          tin: encryptTIN(faker.string.numeric(12)),
+          particular: faker.finance.transactionDescription(),
+        };
+      });
+
+    case "SalesOnAccount":
+      if (locationIds?.length === 0) {
+        console.warn(colors.yellow("No Location records found. Please seed Location data first."));
+        console.warn(colors.yellow("Run: npm run seed:data Location"));
+        throw new Error("SalesOnAccount records require Location references");
+      }
+
+      return Array.from({ length: count }).map(() => {
+        const date = faker.date.recent();
+        return {
+          date,
+          month: date.toLocaleString("default", { month: "long" }),
+          year: date.getFullYear().toString(),
+          location: faker.helpers.arrayElement(locationIds)._id,
+          invoiceNo: `INV-${faker.string.numeric(6)}`,
+          customerName: faker.person.fullName(),
+          address: faker.location.streetAddress(),
+          tin: encryptTIN(faker.string.numeric(12)),
+          particular: faker.finance.transactionDescription(),
+        };
+      });
 
     // case "GeneralJournal":
     //   return Array.from({ length: count }).map(() => {
@@ -136,16 +340,6 @@ const seedCollection = async (modelName, count, clearExisting = false) => {
       );
       return false;
     }
-    // if (!mongoose.modelNames().includes(modelName)) {
-    //   console.error(
-    //     colors.red(
-    //       `Model "${modelName}" does not exist in Mongoose. Available models: ${mongoose
-    //         .modelNames()
-    //         .join(", ")}`
-    //     )
-    //   );
-    //   return false;
-    // }
 
     const Model = mongoose.model(modelName);
 
@@ -158,7 +352,7 @@ const seedCollection = async (modelName, count, clearExisting = false) => {
 
     // Generate and insert data
     console.log(colors.yellow(`Generating ${count} ${modelName} records...`));
-    const data = generateData(modelName, count);
+    const data = await generateData(modelName, count);
 
     // Insert in batches for large datasets
     const batchSize = 100;
@@ -193,8 +387,8 @@ const seedCollection = async (modelName, count, clearExisting = false) => {
 const main = async () => {
   try {
     // Parse command line arguments
-    const modelName = process.argv[2];
-    const count = parseInt(process.argv[3]) || 5;
+    const modelName = process.argv[3];
+    const count = parseInt(process.argv[4]) || 5;
     const clearExisting = process.argv.includes("--clear");
 
     console.log(process.argv);
@@ -214,9 +408,6 @@ const main = async () => {
 
     // Connect to database
     const conn = await connectDB();
-
-    // Load all models
-    // await loadModels();
 
     console.log(colors.cyan(`Starting data seeding for ${modelName}...`));
     const success = await seedCollection(modelName, count, clearExisting);
@@ -239,17 +430,13 @@ const main = async () => {
  * 
  * @example Basic usage - creates 5 Branch records (default)
  * node backend/seed/data/dataSeeder.js Branch
- * -- OR --
- * npm run seed:data Branch
  * 
  * @example Create 10 Branch records
  * node backend/seed/data/dataSeeder.js Branch 10
- * -- OR --
- * npm run seed:data Branch 10
  * 
  * @example Create 5 Branch records and clear existing data
  * NOTE: npm run seed:data is not working in this case 
- * node backend/seed/data/dataSeeder.js Branch 5 --clear
+ * npm run seed:data Branch 5
  * 
  */
 

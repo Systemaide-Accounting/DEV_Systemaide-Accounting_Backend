@@ -99,7 +99,9 @@ export const getCashReceiptsTransactionReport = async (req, res, next) => {
 				$lte: new Date(endDate),
 			},
 			isDeleted: { $ne: true },
-		}).populate("location");
+		})
+		.populate("location")
+		.populate("cashAccount");
 
 		// Decrypt TINs
 		const decryptedTransactions = transactions.map((tx) => {

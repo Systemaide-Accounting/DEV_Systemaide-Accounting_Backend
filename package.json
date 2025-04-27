@@ -7,7 +7,7 @@
     "dev": "nodemon backend/server.js",
     "build": "npm install",
     "start": "node backend/server.js",
-    "seed:data": "node backend/seed/data/dataSeeder.js"
+    "seed:data": "node backend/seed/data/dataSeeder.js --clear"
   },
   "type": "module",
   "keywords": [],

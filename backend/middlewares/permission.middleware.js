@@ -305,6 +305,21 @@ export const hasDeleteAgent = async (req, res, next) => {
         next(error);
     }
 };
+export const hasRestoreAgent = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("restoreAgent")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to restore agent",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
 
 // CompanyInfo Permissions
 export const hasViewAllCompanies = async (req, res, next) => {

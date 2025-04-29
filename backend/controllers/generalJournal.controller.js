@@ -120,6 +120,13 @@ export const deleteGeneralJournal = async (req, res, next) => {
             { new: true, runValidators: true }
         );
 
+		if (deletedJournal.isDeleted) {
+			return res.status(404).json({
+				success: false,
+				message: "Journal is already deleted",
+			});
+		}
+
         if (!deletedJournal) {
             return res.status(404).json({
                 success: false,
@@ -134,4 +141,44 @@ export const deleteGeneralJournal = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+}
+
+export const restoreGeneralJournal = async (req, res, next) => {
+	try {
+		const { id: journalId } = req.params;
+
+		if (!mongoose.Types.ObjectId.isValid(journalId)) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid journal ID",
+			});
+		}
+
+		const restoredJournal = await GeneralJournal.findOneAndUpdate(
+			{ _id: journalId, isDeleted: true },
+			{ isDeleted: false, restoredAt: new Date() },
+			{ new: true, runValidators: true }
+		);
+
+		if (!restoredJournal.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Journal is not deleted",
+            });
+        }
+
+		if (!restoredJournal) {
+			return res.status(404).json({
+				success: false,
+				message: "Journal not found",
+			});
+		}
+
+		res.status(200).json({
+			success: true,
+			data: restoredJournal,
+		});
+	} catch (error) {
+		next(error);
+	}
 }

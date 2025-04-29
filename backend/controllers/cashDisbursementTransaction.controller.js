@@ -72,7 +72,7 @@ export const getCashDisbursementTransactionById = async (req, res, next) => {
         if (!mongoose.Types.ObjectId.isValid(transactionId)) {
             return res.status(404).json({
                 success: false,
-                message: "Transaction not found",
+                message: "Cash disbursement transaction not found",
             });
         }
 
@@ -87,7 +87,7 @@ export const getCashDisbursementTransactionById = async (req, res, next) => {
         if (!transaction) {
             return res.status(404).json({
                 success: false,
-                message: "Transaction not found",
+                message: "Cash disbursement transaction not found",
             });
         }
 
@@ -115,7 +115,7 @@ export const updateCashDisbursementTransaction = async (req, res, next) => {
         if (!mongoose.Types.ObjectId.isValid(transactionId)) {
             return res.status(404).json({
                 success: false,
-                message: "Transaction not found",
+                message: "Cash disbursement transaction not found",
             });
         }
 
@@ -132,7 +132,7 @@ export const updateCashDisbursementTransaction = async (req, res, next) => {
         if (!updatedTransaction) {
             return res.status(404).json({
                 success: false,
-                message: "Transaction not found",
+                message: "Cash disbursement transaction not found",
             });
         }
 
@@ -155,7 +155,7 @@ export const deleteCashDisbursementTransaction = async (req, res, next) => {
         if (!mongoose.Types.ObjectId.isValid(transactionId)) {
             return res.status(404).json({
                 success: false,
-                message: "Transaction not found",
+                message: "Cash disbursement transaction not found",
             });
         }
 
@@ -166,10 +166,17 @@ export const deleteCashDisbursementTransaction = async (req, res, next) => {
             { new: true, runValidators: true }
           );
         
+        if (deletedTransaction.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Cash disbursement transaction already deleted",
+            });
+        }
+
         if (!deletedTransaction) {
             return res.status(404).json({
                 success: false,
-                message: "Transaction not found",
+                message: "Cash disbursement transaction not found",
             });
         }
 
@@ -181,4 +188,46 @@ export const deleteCashDisbursementTransaction = async (req, res, next) => {
         next(error);
     }
 };
+
+export const restoreCashDisbursementTransaction = async (req, res, next) => {
+    try {
+        const { id: transactionId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(transactionId)) {
+            return res.status(404).json({
+                success: false,
+                message: "Cash disbursement transaction not found",
+            });
+        }
+
+        const restoredTransaction = await CashDisbursementTransaction.findOneAndUpdate(
+            { _id: transactionId, isDeleted: true },
+            { isDeleted: false, restoredAt: new Date() },
+            { new: true, runValidators: true }
+        );
+
+        if(!restoredTransaction.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Cash disbursement transaction is not deleted",
+            });
+        }
+
+        if (!restoredTransaction) {
+            return res.status(404).json({
+                success: false,
+                message: "Cash disbursement transaction not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: restoredTransaction,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 

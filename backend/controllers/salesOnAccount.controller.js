@@ -80,8 +80,10 @@ export const getSalesOnAccountById = async (req, res, next) => {
             });
         }
 
-        let transaction = await SalesOnAccount.findById(transactionId)
-            .populate("location");
+        let transaction = await SalesOnAccount.findOne({
+            _id: transactionId,
+            isDeleted: { $ne: true },
+        }).populate("location");
 
         if (!transaction) {
             return res.status(404).json({
@@ -114,8 +116,10 @@ export const updateSalesOnAccount = async (req, res, next) => {
             });
         }
 
-        let transaction = await SalesOnAccount.findById(transactionId)
-            .populate("location");
+        let transaction = await SalesOnAccount.findById({
+            _id: transactionId,
+            isDeleted: { $ne: true },   
+        }).populate("location");
 
         if (!transaction) {
             return res.status(404).json({
@@ -159,10 +163,17 @@ export const deleteSalesOnAccount = async (req, res, next) => {
         }
 
         const deletedTransaction = await SalesOnAccount.findByIdAndUpdate(
-            transactionId,
+            { _id: transactionId, isDeleted: { $ne: true } },
             { isDeleted: true, deletedAt: new Date() },
             { new: true }
         );
+
+        if (deletedTransaction.isDeleted) {
+            return res.status(404).json({
+                success: false,
+                message: "Transaction is already deleted",
+            });
+        }
 
         if (!deletedTransaction) {
             return res.status(404).json({
@@ -174,6 +185,46 @@ export const deleteSalesOnAccount = async (req, res, next) => {
         res.status(200).json({
             success: true,
             data: deletedTransaction,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const restoreSalesOnAccount = async (req, res, next) => {
+    try {
+        const { id: transactionId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(transactionId)) {
+            return res.status(404).json({
+                success: false,
+                message: "Transaction not found",
+            });
+        }
+
+        const restoredTransaction = await SalesOnAccount.findByIdAndUpdate(
+            { _id: transactionId, isDeleted: true },
+            { isDeleted: false, restoredAt: new Date() },
+            { new: true }
+        );
+
+        if (!restoredTransaction.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Transaction is not deleted",
+            });
+        }
+
+        if (!restoredTransaction) {
+            return res.status(404).json({
+                success: false,
+                message: "Transaction not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: restoredTransaction,
         });
     } catch (error) {
         next(error);

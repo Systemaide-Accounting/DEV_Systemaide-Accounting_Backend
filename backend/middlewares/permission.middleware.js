@@ -739,6 +739,21 @@ export const hasDeleteTransaction = async (req, res, next) => {
         next(error);
     }
 };
+export const hasRestoreTransaction = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("restoreTransaction")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to restore transaction",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+}
 export const hasViewJournalReport = async (req, res, next) => {
     try {
         if (req.user.role && req.user.permissions.includes("viewJournalReport")) {

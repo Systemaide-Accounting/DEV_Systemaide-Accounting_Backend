@@ -60,7 +60,7 @@ export const getCashReceiptsTransactionById = async (req, res, next) => {
 		if (!mongoose.Types.ObjectId.isValid(transactionId)) {
 			return res.status(404).json({
 				success: false,
-				message: "Transaction not found",
+				message: "Cash receipts transaction not found",
 			});
 		}
 
@@ -72,7 +72,7 @@ export const getCashReceiptsTransactionById = async (req, res, next) => {
 		if (!transaction) {
 			return res.status(404).json({
 				success: false,
-				message: "Transaction not found",
+				message: "Cash receipts transaction not found",
 			});
 		}
 
@@ -99,7 +99,7 @@ export const updateCashReceiptsTransaction = async (req, res, next) => {
 		if (!mongoose.Types.ObjectId.isValid(transactionId)) {
 			return res.status(404).json({
 				success: false,
-				message: "Transaction not found",
+				message: "Cash receipts transaction not found",
 			});
 		}
 
@@ -116,7 +116,7 @@ export const updateCashReceiptsTransaction = async (req, res, next) => {
 		if (!updatedTransaction) {
 			return res.status(404).json({
 				success: false,
-				message: "Transaction not found",
+				message: "Cash receipts transaction not found",
 			});
 		}
 
@@ -139,7 +139,7 @@ export const deleteCashReceiptsTransaction = async (req, res, next) => {
 		if (!mongoose.Types.ObjectId.isValid(transactionId)) {
 			return res.status(404).json({
 				success: false,
-				message: "Transaction not found",
+				message: "Cash receipts transaction not found",
 			});
 		}
 
@@ -149,10 +149,17 @@ export const deleteCashReceiptsTransaction = async (req, res, next) => {
 			{ new: true, runValidators: true }
 		);
 
+		if (deletedTransaction.isDeleted) {
+			return res.status(400).json({
+				success: false,
+				message: "Cash receipts transaction already deleted",
+			});
+		}
+
 		if (!deletedTransaction) {
 			return res.status(404).json({
 				success: false,
-				message: "Transaction not found",
+				message: "Cash receipts transaction not found",
 			});
 		}
 
@@ -164,3 +171,43 @@ export const deleteCashReceiptsTransaction = async (req, res, next) => {
 		next(error);
 	}
 };
+
+export const restoreCashReceiptsTransaction = async (req, res, next) => {
+	try {
+		const { id: transactionId } = req.params;
+
+		if (!mongoose.Types.ObjectId.isValid(transactionId)) {
+			return res.status(404).json({
+				success: false,
+				message: "Cash receipts transaction not found",
+			});
+		}
+
+		const restoredTransaction = await cashReceiptsTransaction.findOneAndUpdate(
+			{ _id: transactionId, isDeleted: true },
+			{ isDeleted: false, restoredAt: new Date() },
+			{ new: true, runValidators: true }
+		);
+
+		if (!restoredTransaction.isDeleted) {
+			return res.status(400).json({
+				success: false,
+				message: "Cash receipts transaction is not deleted",
+			});
+		}
+
+		if (!restoredTransaction) {
+			return res.status(404).json({
+				success: false,
+				message: "Cash receipts transaction not found",
+			});
+		}
+
+		res.status(200).json({
+			success: true,
+			data: restoredTransaction,
+		});
+	} catch (error) {
+		next(error);
+	}
+}

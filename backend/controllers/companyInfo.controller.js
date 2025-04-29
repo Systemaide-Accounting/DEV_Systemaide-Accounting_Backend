@@ -1,5 +1,6 @@
 import CompanyInfo from "../models/companyInfo.model.js";
 import mongoose from "mongoose";
+import { encryptTIN, decryptTIN } from "../helpers/encryptDecryptUtils.js";
 
 // Check for existing company with the same TIN but is not deleted
 const isCompanyTINExisting = async (company) => {
@@ -26,7 +27,10 @@ export const getLatestCompany = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: companyInfo,
+      data: {
+        ...companyInfo.toObject(),
+        tin: decryptTIN(companyInfo.tin), // Decrypt TIN before sending response
+      },
     });
   } catch (error) {
     next(error);
@@ -35,7 +39,25 @@ export const getLatestCompany = async (req, res, next) => {
 
 export const getAllCompanies = async (req, res, next) => {
  try {
-    const companyInfos = await CompanyInfo.find({ isDeleted: { $ne: true } });
+    let companyInfos = await CompanyInfo.find({ isDeleted: { $ne: true } });
+    
+    // Decrypt TINs
+    companyInfos.map((company) => {
+      const companyObj = company.toObject();
+      try {
+        if (companyObj.tin) {
+          companyObj.tin = decryptTIN(companyObj.tin); // Decrypt TIN
+        }
+      } catch (decryptError) {
+        console.error(
+          `Failed to decrypt TIN for transaction ${companyObj._id}:`,
+          decryptError.message
+        );
+        companyObj.tin = ""; // Set to empty string on decryption failure
+      }
+      return companyObj;
+    });
+
     res.status(200).json({
       success: true,
       data: companyInfos,
@@ -60,6 +82,11 @@ export const createCompany = async (req, res, next) => {
           success: false,
           message: "Company TIN already exists",
         });
+      }
+
+      // Encrypt TIN before saving
+      if (company?.tin) {
+        company.tin = encryptTIN(company.tin); // Encrypt TIN
       }
 
       const newCompany = await CompanyInfo.create(company);
@@ -98,7 +125,10 @@ export const getCompanyById = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: company,
+      data: {
+        ...company.toObject(),
+        tin: decryptTIN(company.tin), // Decrypt TIN before sending response
+      },
     });
   } catch (error) {
     next(error);
@@ -133,6 +163,11 @@ export const updateCompany = async (req, res, next) => {
         success: false,
         message: "Company with the same TIN already exists",
       });
+    }
+
+    // Encrypt TIN before saving
+    if (company?.tin) {
+      company.tin = encryptTIN(company.tin); // Encrypt TIN
     }
 
     const updatedCompany = await CompanyInfo.findOneAndUpdate(
@@ -180,10 +215,17 @@ export const deleteCompany = async (req, res, next) => {
         );
 
         if (!deletedCompany) {
-            return res.status(404).json({
-              success: false,
-              message: "Company not found",
-            });
+          return res.status(404).json({
+            success: false,
+            message: "Company not found",
+          });
+        }
+
+        if (deletedCompany.isDeleted) {
+          return res.status(404).json({
+            success: false,
+            message: "Company is already deleted",
+          });
         }
 
         res.status(200).json({
@@ -194,3 +236,44 @@ export const deleteCompany = async (req, res, next) => {
         next(error);
     }
 };
+
+export const restoreCompany = async (req, res, next) => {
+  try {
+    const { id: companyId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(companyId)) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found",
+      });
+    }
+
+    // update the isDeleted to false and deletedAt to null
+    const restoredCompany = await CompanyInfo.findOneAndUpdate(
+      { _id: companyId, isDeleted: true }, // filter
+      { isDeleted: false, restoredAt: new Date() }, // update
+      { new: true, runValidators: true }
+    );
+
+    if (!restoredCompany) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found",
+      });
+    }
+  
+    if (!restoredCompany.isDeleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Company is not deleted",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: restoredCompany,
+    });
+  } catch (error) {
+    next(error);
+  }
+}

@@ -4,39 +4,40 @@ import { encryptTIN, decryptTIN } from "../helpers/encryptDecryptUtils.js";
 
 export const getAllSalesOnAccount = async (req, res, next) => {
     try {
-        let transactions = await SalesOnAccount.find({ isDeleted: { $ne: true } })
-            .populate("location")
+      let transactions = await SalesOnAccount.find({
+        isDeleted: { $ne: true },
+      }).populate("location");
 
-        // Decrypt TINs
-        // transactions = transactions.map((tx) => {
-        //     return {
-        //       ...tx.toObject(),
-        //       // tin: decryptTIN(tx.tin),
-        //       tin: tx.tin ? decryptTIN(tx.tin) : "",
-        //     };
-        // });
-
-        transactions = transactions.map((tx) => {
-          const txObj = tx.toObject();
-          try {
-            // Only attempt to decrypt if tin exists and is not empty
-            if (txObj.tin) {
-              txObj.tin = decryptTIN(txObj.tin);
-            }
-          } catch (decryptError) {
-            console.error(
-              `Failed to decrypt TIN for transaction ${txObj._id}:`,
-              decryptError.message
-            );
-            txObj.tin = ""; // Set to empty string on decryption failure
+      // Decrypt TINs
+      // transactions = transactions.map((tx) => {
+      //     return {
+      //       ...tx.toObject(),
+      //       // tin: decryptTIN(tx.tin),
+      //       tin: tx.tin ? decryptTIN(tx.tin) : "",
+      //     };
+      // });
+      // Decrypt TINs
+      transactions = transactions.map((tx) => {
+        const txObj = tx.toObject();
+        try {
+          // Only attempt to decrypt if tin exists and is not empty
+          if (txObj.tin) {
+            txObj.tin = decryptTIN(txObj.tin);
           }
-          return txObj;
-        });
+        } catch (decryptError) {
+          console.error(
+            `Failed to decrypt TIN for transaction ${txObj._id}:`,
+            decryptError.message
+          );
+          txObj.tin = ""; // Set to empty string on decryption failure
+        }
+        return txObj;
+      });
 
-        res.status(200).json({
-            success: true,
-            data: transactions,
-        });
+      res.status(200).json({
+        success: true,
+        data: transactions,
+      });
     } catch (error) {
         next(error);
     }
@@ -79,8 +80,10 @@ export const getSalesOnAccountById = async (req, res, next) => {
             });
         }
 
-        let transaction = await SalesOnAccount.findById(transactionId)
-            .populate("location");
+        let transaction = await SalesOnAccount.findOne({
+            _id: transactionId,
+            isDeleted: { $ne: true },
+        }).populate("location");
 
         if (!transaction) {
             return res.status(404).json({
@@ -113,8 +116,10 @@ export const updateSalesOnAccount = async (req, res, next) => {
             });
         }
 
-        let transaction = await SalesOnAccount.findById(transactionId)
-            .populate("location");
+        let transaction = await SalesOnAccount.findById({
+            _id: transactionId,
+            isDeleted: { $ne: true },   
+        }).populate("location");
 
         if (!transaction) {
             return res.status(404).json({
@@ -158,11 +163,12 @@ export const deleteSalesOnAccount = async (req, res, next) => {
         }
 
         const deletedTransaction = await SalesOnAccount.findByIdAndUpdate(
-            transactionId,
+            { _id: transactionId, isDeleted: { $ne: true } },
             { isDeleted: true, deletedAt: new Date() },
             { new: true }
         );
 
+        
         if (!deletedTransaction) {
             return res.status(404).json({
                 success: false,
@@ -170,9 +176,56 @@ export const deleteSalesOnAccount = async (req, res, next) => {
             });
         }
 
+        if (deletedTransaction.isDeleted) {
+            return res.status(404).json({
+                success: false,
+                message: "Transaction is already deleted",
+            });
+        }
+
         res.status(200).json({
             success: true,
             data: deletedTransaction,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const restoreSalesOnAccount = async (req, res, next) => {
+    try {
+        const { id: transactionId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(transactionId)) {
+            return res.status(404).json({
+                success: false,
+                message: "Transaction not found",
+            });
+        }
+
+        const restoredTransaction = await SalesOnAccount.findByIdAndUpdate(
+            { _id: transactionId, isDeleted: true },
+            { isDeleted: false, restoredAt: new Date() },
+            { new: true }
+        );
+
+        if (!restoredTransaction) {
+            return res.status(404).json({
+                success: false,
+                message: "Transaction not found",
+            });
+        }
+
+        if (!restoredTransaction.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Transaction is not deleted",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: restoredTransaction,
         });
     } catch (error) {
         next(error);

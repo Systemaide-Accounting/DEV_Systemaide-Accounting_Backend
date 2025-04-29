@@ -1,5 +1,6 @@
 import AgentInfo from "../models/agentInfo.model.js";
 import mongoose from "mongoose";
+import { encryptTIN, decryptTIN } from "../helpers/encryptDecryptUtils.js";
 
 const isAgentTINExisting = async (agent) => {
     const existingAgent = await AgentInfo.findOne({
@@ -19,7 +20,26 @@ const isAgentCodeExisting = async (agent) => {
 
 export const getAllAgents = async (req, res, next) => {
     try {
-        const agentInfos = await AgentInfo.find({ isDeleted: { $ne: true } });
+        let agentInfos = await AgentInfo.find({ isDeleted: { $ne: true } });
+
+        // Decrypt TINs
+        agentInfos = agentInfos.map((agent) => {
+          const agentObj = agent.toObject();
+          try {
+            // Only attempt to decrypt if tin exists and is not empty
+            if (agentObj.tin) {
+              agentObj.tin = decryptTIN(agentObj.tin);
+            }
+          } catch (decryptError) {
+            console.error(
+              `Failed to decrypt TIN for transaction ${agentObj._id}:`,
+              decryptError.message
+            );
+            agentObj.tin = ""; // Set to empty string on decryption failure
+          }
+          return agentObj;
+        });
+
         res.status(200).json({
           success: true,
           data: agentInfos,
@@ -53,6 +73,11 @@ export const createAgent = async (req, res, next) => {
             success: false,
             message: "Agent code already exists",
           });
+        }
+
+        // Encrypt TIN before saving
+        if (agent?.tin) {
+          agent.tin = encryptTIN(agent.tin);
         }
 
         const newAgent = await AgentInfo.create(agent);
@@ -91,7 +116,10 @@ export const getAgentById = async (req, res, next) => {
 
         res.status(200).json({
           success: true,
-          data: agent,
+          data: {
+            ...agent.toObject(),
+            tin: decryptTIN(agent.tin), // Decrypt TIN before sending response
+          },
         });
     } catch (error) {
         next(error);
@@ -138,6 +166,11 @@ export const updateAgent = async (req, res, next) => {
             success: false,
             message: "Agent with the same code already exists",
           });
+        }
+
+        // Encrypt TIN before saving
+        if (agent?.tin) {
+          agent.tin = encryptTIN(agent.tin);
         }
 
         const updatedAgent = await AgentInfo.findOneAndUpdate(
@@ -189,6 +222,14 @@ export const deleteAgent = async (req, res, next) => {
       });
     }
 
+    if (deletedAgent.isDeleted) {
+      return res.status(400).json({
+        success: false,
+        message: "Agent is already deleted",
+      });
+    }
+
+
     res.status(200).json({
       success: true,
       data: deletedAgent,
@@ -197,3 +238,44 @@ export const deleteAgent = async (req, res, next) => {
     next(error);
   }
 };
+
+export const restoreAgent = async (req, res, next) => {
+  try {
+    const { id: agentId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(agentId)) {
+      return res.status(404).json({
+        success: false,
+        message: "Agent not found",
+      });
+    }
+
+    const restoredAgent = await AgentInfo.findOneAndUpdate(
+      { _id: agentId, isDeleted: true },
+      { isDeleted: false, restoredAt: new Date() },
+      { new: true, runValidators: true }
+    );
+
+    if (!restoredAgent) {
+      return res.status(404).json({
+        success: false,
+        message: "Agent not found",
+      });
+      
+    if (!restoredAgent.isDeleted) {
+      return res.status(400).json({
+        success: false,
+        message: "Agent is not deleted",
+      });
+    }
+
+    }
+
+    res.status(200).json({
+      success: true,
+      data: restoredAgent,
+    });
+  } catch (error) {
+    next(error);
+  }
+}

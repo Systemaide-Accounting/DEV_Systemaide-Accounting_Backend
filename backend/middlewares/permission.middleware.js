@@ -305,6 +305,21 @@ export const hasDeleteAgent = async (req, res, next) => {
         next(error);
     }
 };
+export const hasRestoreAgent = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("restoreAgent")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to restore agent",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
 
 // CompanyInfo Permissions
 export const hasViewAllCompanies = async (req, res, next) => {
@@ -376,6 +391,21 @@ export const hasDeleteCompany = async (req, res, next) => {
         return res.status(403).json({
             success: false,
             message: "No Permission to delete company",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+export const hasRestoreCompany = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("restoreCompany")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to restore company",
         });
     } catch (error) {
         error.statusCode = 403;
@@ -537,6 +567,22 @@ export const hasDeleteLocation = async (req, res, next) => {
         next(error);
     }
 };
+export const hasRestoreLocation = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("restoreLocation")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to restore location",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+
 
 // Branch Permissions
 export const hasViewAllBranches = async (req, res, next) => {
@@ -616,6 +662,21 @@ export const hasDeleteBranch = async (req, res, next) => {
         next(error);
     }
 };
+export const hasRestoreBranch = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("restoreBranch")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to restore branch",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+}
 
 // Transaction Permissions
 export const hasViewAllTransactions = async (req, res, next) => {
@@ -693,3 +754,33 @@ export const hasDeleteTransaction = async (req, res, next) => {
         next(error);
     }
 };
+export const hasRestoreTransaction = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("restoreTransaction")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to restore transaction",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+}
+export const hasViewJournalReport = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewJournalReport")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view journal report",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+}

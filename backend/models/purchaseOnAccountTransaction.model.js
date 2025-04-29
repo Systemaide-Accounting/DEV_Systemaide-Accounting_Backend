@@ -7,6 +7,16 @@ const purchaseOnAccountTransactionSchema = mongoose.Schema(
       required: [true, "Date is required"],
       default: Date.now,
     },
+    month: {
+      type: String,
+      required: [true, "Month is required"],
+      trim: true,
+    },
+    year: {
+      type: String,
+      required: [true, "Year is required"],
+      trim: true,
+    },
     location: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Location",
@@ -16,6 +26,12 @@ const purchaseOnAccountTransactionSchema = mongoose.Schema(
       type: String,
       required: [true, "PV No is required"],
       maxlength: [50, "PV No cannot exceed 50 characters"],
+      trim: true,
+    },
+    invoiceNo: {
+      type: String,
+      required: [true, "Invoice No is required"],
+      maxlength: [50, "Invoice No cannot exceed 50 characters"],
       trim: true,
     },
     supplierName: {

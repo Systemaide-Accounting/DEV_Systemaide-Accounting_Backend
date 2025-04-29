@@ -149,17 +149,17 @@ export const deleteCashReceiptsTransaction = async (req, res, next) => {
 			{ new: true, runValidators: true }
 		);
 
-		if (deletedTransaction.isDeleted) {
-			return res.status(400).json({
-				success: false,
-				message: "Cash receipts transaction already deleted",
-			});
-		}
-
 		if (!deletedTransaction) {
 			return res.status(404).json({
 				success: false,
 				message: "Cash receipts transaction not found",
+			});
+		}
+
+		if (deletedTransaction.isDeleted) {
+			return res.status(400).json({
+				success: false,
+				message: "Cash receipts transaction already deleted",
 			});
 		}
 
@@ -189,17 +189,17 @@ export const restoreCashReceiptsTransaction = async (req, res, next) => {
 			{ new: true, runValidators: true }
 		);
 
-		if (!restoredTransaction.isDeleted) {
-			return res.status(400).json({
-				success: false,
-				message: "Cash receipts transaction is not deleted",
-			});
-		}
-
 		if (!restoredTransaction) {
 			return res.status(404).json({
 				success: false,
 				message: "Cash receipts transaction not found",
+			});
+		}
+
+		if (!restoredTransaction.isDeleted) {
+			return res.status(400).json({
+				success: false,
+				message: "Cash receipts transaction is not deleted",
 			});
 		}
 

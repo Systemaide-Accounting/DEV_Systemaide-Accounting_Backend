@@ -233,17 +233,17 @@ export const deleteLocation = async (req, res, next) => {
             { new: true, runValidators: true }
         );
 
-        if (deletedLocation.isDeleted) {
-          return res.status(400).json({
-            success: false,
-            message: "Location is already deleted",
-          });
-        }
-
         if (!deletedLocation) {
           return res.status(404).json({
             success: false,
             message: "Location not found",
+          });
+        }
+
+        if (deletedLocation.isDeleted) {
+          return res.status(400).json({
+            success: false,
+            message: "Location is already deleted",
           });
         }
 
@@ -273,18 +273,18 @@ export const restoreLocation = async (req, res, next) => {
             { new: true, runValidators: true }
         );
 
+        if (!restoredLocation) {
+          return res.status(404).json({
+            success: false,
+            message: "Location not found",
+          });
+        }
+
         if (!restoredLocation.isDeleted) {
           return res.status(400).json({
             success: false,
             message: "Location is not deleted",
 
-          });
-        }
-
-        if (!restoredLocation) {
-          return res.status(404).json({
-            success: false,
-            message: "Location not found",
           });
         }
 

@@ -214,18 +214,18 @@ export const deleteCompany = async (req, res, next) => {
           { new: true, runValidators: true }
         );
 
-        if (deletedCompany.isDeleted) {
-            return res.status(404).json({
-              success: false,
-              message: "Company is already deleted",
-            });
+        if (!deletedCompany) {
+          return res.status(404).json({
+            success: false,
+            message: "Company not found",
+          });
         }
 
-        if (!deletedCompany) {
-            return res.status(404).json({
-              success: false,
-              message: "Company not found",
-            });
+        if (deletedCompany.isDeleted) {
+          return res.status(404).json({
+            success: false,
+            message: "Company is already deleted",
+          });
         }
 
         res.status(200).json({
@@ -254,18 +254,18 @@ export const restoreCompany = async (req, res, next) => {
       { isDeleted: false, restoredAt: new Date() }, // update
       { new: true, runValidators: true }
     );
-  
-    if (!restoredCompany.isDeleted) {
-      return res.status(404).json({
-        success: false,
-        message: "Company is not deleted",
-      });
-    }
 
     if (!restoredCompany) {
       return res.status(404).json({
         success: false,
         message: "Company not found",
+      });
+    }
+  
+    if (!restoredCompany.isDeleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Company is not deleted",
       });
     }
 

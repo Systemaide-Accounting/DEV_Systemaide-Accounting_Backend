@@ -120,19 +120,19 @@ export const deleteGeneralJournal = async (req, res, next) => {
             { new: true, runValidators: true }
         );
 
+		if (!deletedJournal) {
+            return res.status(404).json({
+                success: false,
+                message: "Journal not found",
+            });
+        }
+
 		if (deletedJournal.isDeleted) {
 			return res.status(404).json({
 				success: false,
 				message: "Journal is already deleted",
 			});
 		}
-
-        if (!deletedJournal) {
-            return res.status(404).json({
-                success: false,
-                message: "Journal not found",
-            });
-        }
 
         res.status(200).json({
             success: true,
@@ -160,19 +160,19 @@ export const restoreGeneralJournal = async (req, res, next) => {
 			{ new: true, runValidators: true }
 		);
 
-		if (!restoredJournal.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Journal is not deleted",
-            });
-        }
-
 		if (!restoredJournal) {
 			return res.status(404).json({
 				success: false,
 				message: "Journal not found",
 			});
 		}
+
+		if (!restoredJournal.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Journal is not deleted",
+            });
+        }
 
 		res.status(200).json({
 			success: true,

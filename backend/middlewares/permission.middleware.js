@@ -405,7 +405,7 @@ export const hasRestoreCompany = async (req, res, next) => {
 
         return res.status(403).json({
             success: false,
-            message: "No Permission to delete company",
+            message: "No Permission to restore company",
         });
     } catch (error) {
         error.statusCode = 403;

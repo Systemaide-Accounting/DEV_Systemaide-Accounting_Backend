@@ -168,17 +168,18 @@ export const deleteSalesOnAccount = async (req, res, next) => {
             { new: true }
         );
 
-        if (deletedTransaction.isDeleted) {
-            return res.status(404).json({
-                success: false,
-                message: "Transaction is already deleted",
-            });
-        }
-
+        
         if (!deletedTransaction) {
             return res.status(404).json({
                 success: false,
                 message: "Transaction not found",
+            });
+        }
+
+        if (deletedTransaction.isDeleted) {
+            return res.status(404).json({
+                success: false,
+                message: "Transaction is already deleted",
             });
         }
 
@@ -208,17 +209,17 @@ export const restoreSalesOnAccount = async (req, res, next) => {
             { new: true }
         );
 
-        if (!restoredTransaction.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Transaction is not deleted",
-            });
-        }
-
         if (!restoredTransaction) {
             return res.status(404).json({
                 success: false,
                 message: "Transaction not found",
+            });
+        }
+
+        if (!restoredTransaction.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Transaction is not deleted",
             });
         }
 

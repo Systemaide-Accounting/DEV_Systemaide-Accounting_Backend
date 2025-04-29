@@ -215,6 +215,13 @@ export const deleteAgent = async (req, res, next) => {
       { new: true, runValidators: true, }
     );
 
+    if (!deletedAgent) {
+      return res.status(404).json({
+        success: false,
+        message: "Agent not found",
+      });
+    }
+
     if (deletedAgent.isDeleted) {
       return res.status(400).json({
         success: false,
@@ -222,12 +229,6 @@ export const deleteAgent = async (req, res, next) => {
       });
     }
 
-    if (!deletedAgent) {
-      return res.status(404).json({
-        success: false,
-        message: "Agent not found",
-      });
-    }
 
     res.status(200).json({
       success: true,
@@ -255,6 +256,12 @@ export const restoreAgent = async (req, res, next) => {
       { new: true, runValidators: true }
     );
 
+    if (!restoredAgent) {
+      return res.status(404).json({
+        success: false,
+        message: "Agent not found",
+      });
+      
     if (!restoredAgent.isDeleted) {
       return res.status(400).json({
         success: false,
@@ -262,11 +269,6 @@ export const restoreAgent = async (req, res, next) => {
       });
     }
 
-    if (!restoredAgent) {
-      return res.status(404).json({
-        success: false,
-        message: "Agent not found",
-      });
     }
 
     res.status(200).json({

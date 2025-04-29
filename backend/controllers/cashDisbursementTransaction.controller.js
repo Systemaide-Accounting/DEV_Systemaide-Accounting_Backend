@@ -166,17 +166,17 @@ export const deleteCashDisbursementTransaction = async (req, res, next) => {
             { new: true, runValidators: true }
           );
         
-        if (deletedTransaction.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Cash disbursement transaction already deleted",
-            });
-        }
-
         if (!deletedTransaction) {
             return res.status(404).json({
                 success: false,
                 message: "Cash disbursement transaction not found",
+            });
+        }
+
+        if (deletedTransaction.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Cash disbursement transaction already deleted",
             });
         }
 
@@ -206,17 +206,17 @@ export const restoreCashDisbursementTransaction = async (req, res, next) => {
             { new: true, runValidators: true }
         );
 
-        if(!restoredTransaction.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Cash disbursement transaction is not deleted",
-            });
-        }
-
         if (!restoredTransaction) {
             return res.status(404).json({
                 success: false,
                 message: "Cash disbursement transaction not found",
+            });
+        }
+
+        if(!restoredTransaction.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Cash disbursement transaction is not deleted",
             });
         }
 

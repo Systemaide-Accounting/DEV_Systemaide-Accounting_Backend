@@ -1,5 +1,5 @@
 import express from 'express';
-import { createLocation, deleteLocation, getAllLocations, getLocationById, updateLocation } from '../controllers/location.controller.js';
+import { createLocation, deleteLocation, getAllLocations, getLocationById, updateLocation, restoreLocation } from '../controllers/location.controller.js';
 import { isAuthorized } from '../middlewares/auth.middleware.js';
 import { hasCreateLocation, hasDeleteLocation, hasUpdateLocation, hasViewAllLocations, hasViewLocationById } from '../middlewares/permission.middleware.js';
 
@@ -10,5 +10,6 @@ router.post('/', isAuthorized, hasCreateLocation, createLocation);
 router.get('/:id', isAuthorized, hasViewLocationById, getLocationById);
 router.patch('/:id', isAuthorized, hasUpdateLocation, updateLocation);
 router.delete("/delete/:id", isAuthorized, hasDeleteLocation, deleteLocation);
+router.patch("/restore/:id", isAuthorized, hasDeleteLocation, restoreLocation);
 
 export default router;

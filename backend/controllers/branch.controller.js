@@ -182,6 +182,13 @@ export const deleteBranch = async (req, res, next) => {
             { new: true, runValidators: true }
         );
 
+        if (deletedBranch.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Branch is already deleted",
+            });
+        }
+
         if (!deletedBranch) {
             return res.status(404).json({
                 success: false,
@@ -214,6 +221,13 @@ export const restoreBranch = async (req, res, next) => {
             { isDeleted: false, $unset: { deletedAt: "" } },
             { new: true, runValidators: true }
         );
+
+        if (!restoredBranch.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Branch is not deleted",
+            });
+        }
 
         if (!restoredBranch) {
             return res.status(404).json({

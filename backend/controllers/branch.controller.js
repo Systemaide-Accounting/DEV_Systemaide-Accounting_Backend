@@ -197,3 +197,36 @@ export const deleteBranch = async (req, res, next) => {
         next(error);
     }
 };
+
+export const restoreBranch = async (req, res, next) => {
+    try {
+        const { id: branchId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(branchId)) {
+            return res.status(404).json({
+                success: false,
+                message: "Branch not found",
+            });
+        }
+
+        const restoredBranch = await Branch.findOneAndUpdate(
+            { _id: branchId, isDeleted: true },
+            { isDeleted: false, $unset: { deletedAt: "" } },
+            { new: true, runValidators: true }
+        );
+
+        if (!restoredBranch) {
+            return res.status(404).json({
+                success: false,
+                message: "Branch not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: restoredBranch,
+        });
+    } catch (error) {
+        next(error);
+    }
+};

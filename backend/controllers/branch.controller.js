@@ -218,7 +218,7 @@ export const restoreBranch = async (req, res, next) => {
 
         const restoredBranch = await Branch.findOneAndUpdate(
             { _id: branchId, isDeleted: true },
-            { isDeleted: false, $unset: { deletedAt: "" } },
+            { isDeleted: false, restoredAt: new Date() },
             { new: true, runValidators: true }
         );
 

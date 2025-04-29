@@ -269,7 +269,7 @@ export const restoreLocation = async (req, res, next) => {
 
         const restoredLocation = await Location.findOneAndUpdate(
             { _id: locationId, isDeleted: true },
-            { isDeleted: false, $unset: { deletedAt: "" } },
+            { isDeleted: false, restoredAt: new Date() },
             { new: true, runValidators: true }
         );
 

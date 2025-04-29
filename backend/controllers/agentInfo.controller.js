@@ -222,6 +222,14 @@ export const deleteAgent = async (req, res, next) => {
       });
     }
 
+    if (deletedAgent.isDeleted) {
+      return res.status(400).json({
+        success: false,
+        message: "Agent is already deleted",
+      });
+    }
+
+
     res.status(200).json({
       success: true,
       data: deletedAgent,
@@ -230,3 +238,44 @@ export const deleteAgent = async (req, res, next) => {
     next(error);
   }
 };
+
+export const restoreAgent = async (req, res, next) => {
+  try {
+    const { id: agentId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(agentId)) {
+      return res.status(404).json({
+        success: false,
+        message: "Agent not found",
+      });
+    }
+
+    const restoredAgent = await AgentInfo.findOneAndUpdate(
+      { _id: agentId, isDeleted: true },
+      { isDeleted: false, restoredAt: new Date() },
+      { new: true, runValidators: true }
+    );
+
+    if (!restoredAgent) {
+      return res.status(404).json({
+        success: false,
+        message: "Agent not found",
+      });
+      
+    if (!restoredAgent.isDeleted) {
+      return res.status(400).json({
+        success: false,
+        message: "Agent is not deleted",
+      });
+    }
+
+    }
+
+    res.status(200).json({
+      success: true,
+      data: restoredAgent,
+    });
+  } catch (error) {
+    next(error);
+  }
+}

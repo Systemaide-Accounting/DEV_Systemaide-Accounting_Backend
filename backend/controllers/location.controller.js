@@ -240,6 +240,13 @@ export const deleteLocation = async (req, res, next) => {
           });
         }
 
+        if (deletedLocation.isDeleted) {
+          return res.status(400).json({
+            success: false,
+            message: "Location is already deleted",
+          });
+        }
+
         res.status(200).json({
           success: true,
           data: deletedLocation,
@@ -248,3 +255,45 @@ export const deleteLocation = async (req, res, next) => {
         next(error);
     }
 };
+
+export const restoreLocation = async (req, res, next) => {
+    try {
+        const { id: locationId } = req.params;
+
+        if(!mongoose.Types.ObjectId.isValid(locationId)) {
+          return res.status(404).json({
+            success: false,
+            message: "Location not found",
+          });
+        }
+
+        const restoredLocation = await Location.findOneAndUpdate(
+            { _id: locationId, isDeleted: true },
+            { isDeleted: false, restoredAt: new Date() },
+            { new: true, runValidators: true }
+        );
+
+        if (!restoredLocation) {
+          return res.status(404).json({
+            success: false,
+            message: "Location not found",
+          });
+        }
+
+        if (!restoredLocation.isDeleted) {
+          return res.status(400).json({
+            success: false,
+            message: "Location is not deleted",
+
+          });
+        }
+
+        res.status(200).json({
+          success: true,
+          data: restoredLocation,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}

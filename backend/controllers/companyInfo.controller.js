@@ -215,10 +215,17 @@ export const deleteCompany = async (req, res, next) => {
         );
 
         if (!deletedCompany) {
-            return res.status(404).json({
-              success: false,
-              message: "Company not found",
-            });
+          return res.status(404).json({
+            success: false,
+            message: "Company not found",
+          });
+        }
+
+        if (deletedCompany.isDeleted) {
+          return res.status(404).json({
+            success: false,
+            message: "Company is already deleted",
+          });
         }
 
         res.status(200).json({
@@ -229,3 +236,44 @@ export const deleteCompany = async (req, res, next) => {
         next(error);
     }
 };
+
+export const restoreCompany = async (req, res, next) => {
+  try {
+    const { id: companyId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(companyId)) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found",
+      });
+    }
+
+    // update the isDeleted to false and deletedAt to null
+    const restoredCompany = await CompanyInfo.findOneAndUpdate(
+      { _id: companyId, isDeleted: true }, // filter
+      { isDeleted: false, restoredAt: new Date() }, // update
+      { new: true, runValidators: true }
+    );
+
+    if (!restoredCompany) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found",
+      });
+    }
+  
+    if (!restoredCompany.isDeleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Company is not deleted",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: restoredCompany,
+    });
+  } catch (error) {
+    next(error);
+  }
+}

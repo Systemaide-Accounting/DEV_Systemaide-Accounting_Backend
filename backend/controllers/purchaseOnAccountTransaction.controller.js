@@ -155,6 +155,13 @@ export const deletePurchaseOnAccountTransaction = async (req, res, next) => {
             });
         }
 
+        if (deletedTransaction.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Transaction is already deleted",
+            });
+        }
+
         res.status(200).json({
             success: true,
             data: deletedTransaction,
@@ -163,3 +170,44 @@ export const deletePurchaseOnAccountTransaction = async (req, res, next) => {
         next(error);
     }
 };
+
+export const restorePurchaseOnAccountTransaction = async (req, res, next) => {
+    try {
+        const { id: transactionId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(transactionId)) {
+            return res.status(404).json({
+                success: false,
+                message: "Transaction not found",
+            });
+        }
+
+        const restoredTransaction = await PurchaseOnAccountTransaction.findOneAndUpdate(
+            { _id: transactionId, isDeleted: true },
+            { isDeleted: false, restoredAt: new Date() },
+            { new: true, runValidators: true }
+        );
+
+        if (!restoredTransaction) {
+            return res.status(404).json({
+                success: false,
+                message: "Transaction not found",
+            });
+        }
+
+        if (!restoredTransaction.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Transaction is not deleted",
+            });
+        }
+
+
+        res.status(200).json({
+            success: true,
+            data: restoredTransaction,
+        });
+    } catch (error) {
+        next(error);
+    }
+}

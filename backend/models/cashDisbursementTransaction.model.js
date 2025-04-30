@@ -72,6 +72,16 @@ const cashDisbursementTransactionSchema = mongoose.Schema(
       maxlength: [255, "Particular cannot exceed 255 characters"],
       trim: true,
     },
+    totalDebit: {
+      type: String,
+      // required: [true, "Total Debit is required"],
+      trim: true,
+    },
+    totalCredit: {
+      type: String,
+      // required: [true, "Total Credit is required"],
+      trim: true,
+    },
     transactionLines: {
       type: String,
       trim: true,

@@ -1,23 +1,7 @@
 import express from "express";
-import {
-  isAdmin,
-  isAuthorized,
-  isRegular,
-  isSysAdmin,
-} from "../middlewares/auth.middleware.js";
-import {
-  createAccount,
-  deleteAccount,
-  getAccountById,
-  getAllAccounts,
-  getAllParentAccounts,
-  getChildAccounts,
-  updateAccount,
-  deleteAllAccountsPermanently,
-  getAllChildAccounts,
-  addChildAccount,
-} from "../controllers/chartOfAccount.controller.js";
-import { hasCreateAccount, hasDeleteAccount, hasUpdateAccount, hasViewAccountById, hasViewAllAccounts } from "../middlewares/permission.middleware.js";
+import { isAdmin, isAuthorized, isRegular, isSysAdmin } from "../middlewares/auth.middleware.js";
+import { createAccount, deleteAccount, getAccountById, getAllAccounts, getAllParentAccounts, getChildAccounts, updateAccount, deleteAllAccountsPermanently, getAllChildAccounts, addChildAccount, restoreAccount} from "../controllers/chartOfAccount.controller.js";
+import { hasCreateAccount, hasDeleteAccount, hasUpdateAccount, hasViewAccountById, hasViewAllAccounts, hasRestoreAccount } from "../middlewares/permission.middleware.js";
 
 const router = express.Router();
 
@@ -32,5 +16,6 @@ router.post("/", isAuthorized, hasCreateAccount, createAccount);
 router.patch("/:id", isAuthorized, hasUpdateAccount, updateAccount);
 router.delete("/delete/:id", isAuthorized, hasDeleteAccount, deleteAccount);
 router.delete("/delete/all", isAuthorized, hasDeleteAccount, deleteAllAccountsPermanently);
+router.patch("/restore/:id", isAuthorized, hasRestoreAccount, restoreAccount);
 
 export default router;

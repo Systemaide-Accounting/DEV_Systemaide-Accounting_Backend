@@ -9,12 +9,12 @@ const SalesOnAccountSchema = mongoose.Schema(
 		},
 		month: {
 			type: String,
-			required: [true, "Month is required"],
+			// required: [true, "Month is required"],
 			trim: true,
 		},
 		year: {
 			type: String,
-			required: [true, "Year is required"],
+			// required: [true, "Year is required"],
 			trim: true,
 		},
 		location: {
@@ -35,12 +35,14 @@ const SalesOnAccountSchema = mongoose.Schema(
 			trim: true,
 		},
 		address: {
+			// value based on customer name or agent
 			type: String,
 			required: [true, "Address is required"],
 			maxlength: [255, "Address cannot exceed 255 characters"],
 			trim: true,
 		},
 		tin: {
+			// value based on customer name or agent
 			type: String,
 			required: [true, "Tin is required"],
 			maxlength: [255, "Tin cannot exceed 255 characters"],

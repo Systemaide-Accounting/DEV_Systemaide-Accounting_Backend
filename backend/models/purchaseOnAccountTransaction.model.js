@@ -9,12 +9,12 @@ const purchaseOnAccountTransactionSchema = mongoose.Schema(
     },
     month: {
       type: String,
-      required: [true, "Month is required"],
+      // required: [true, "Month is required"],
       trim: true,
     },
     year: {
       type: String,
-      required: [true, "Year is required"],
+      // required: [true, "Year is required"],
       trim: true,
     },
     location: {
@@ -40,11 +40,13 @@ const purchaseOnAccountTransactionSchema = mongoose.Schema(
       required: [true, "Supplier Name is required"],
     },
     address: {
+      // value based on supplier name or agent
       type: String,
       maxlength: [255, "Address cannot exceed 255 characters"],
       trim: true,
     },
     tin: {
+      // value based on supplier name or agent
       type: String,
       maxlength: [255, "TIN cannot exceed 255 characters"],
       trim: true,

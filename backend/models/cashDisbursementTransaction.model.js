@@ -9,12 +9,12 @@ const cashDisbursementTransactionSchema = mongoose.Schema(
     },
     month: {
       type: String,
-      required: [true, "Month is required"],
+      // required: [true, "Month is required"],
       trim: true,
     },
     year: {
       type: String,
-      required: [true, "Year is required"],
+      // required: [true, "Year is required"],
       trim: true,
     },
     location: {
@@ -41,18 +41,14 @@ const cashDisbursementTransactionSchema = mongoose.Schema(
       required: [true, "Payee Name is required"],
       trim: true,
     },
-    // addressTIN: {
-    //   type: String,
-    //   required: [true, "Address/TIN is required"],
-    //   maxlength: [255, "Address/TIN cannot exceed 255 characters"],
-    //   trim: true,
-    // },
+    // value is based on payee or agent
     address: {
       type: String,
       required: [true, "Address is required"],
       maxlength: [255, "Address cannot exceed 255 characters"],
       trim: true,
     },
+    // value is based on payee or agent
     tin: {
       type: String,
       required: [true, "Tin is required"],
@@ -63,6 +59,11 @@ const cashDisbursementTransactionSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "ChartOfAccount",
       required: [true, "Cash Account is required"],
+      trim: true,
+    },
+    cashCredit: {
+      type: String,
+      // required: [true, "Cash Credit is required"],
       trim: true,
     },
     particular: {

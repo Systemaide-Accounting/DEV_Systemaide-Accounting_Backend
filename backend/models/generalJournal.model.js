@@ -9,12 +9,12 @@ const generalJournalSchema = mongoose.Schema(
 		},
 		month: {
 			type: String,
-			required: [true, "Month is required"],
+			// required: [true, "Month is required"],
 			trim: true,
 		},
 		year: {
 			type: String,
-			required: [true, "Year is required"],
+			// required: [true, "Year is required"],
 			trim: true,
 		},
 		location: {

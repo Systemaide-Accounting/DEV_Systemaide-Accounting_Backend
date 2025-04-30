@@ -184,3 +184,37 @@ export const blockUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const unblockUser = async (req, res, next) => {
+  try {
+    const { id: userId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // update the status into active
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId, status: "blocked" },
+      { status: "inactive", restoredAt: new Date() },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: updatedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+}

@@ -74,6 +74,21 @@ export const hasDeleteUser = async (req, res, next) => {
         next(error);
     }
 };
+export const hasRestoreUser = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("restoreUser")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to restore user",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
 
 // Role Permissions
 export const hasViewAllRoles = async (req, res, next) => {
@@ -489,6 +504,22 @@ export const hasDeleteAccount = async (req, res, next) => {
         next(error);
     }
 };
+export const hasRestoreAccount = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("restoreAccount")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to restore account",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+};
+
 
 // Location Permissions
 export const hasViewAllLocations = async (req, res, next) => {

@@ -583,6 +583,13 @@ export const deleteAccount = async (req, res, next) => {
             });
         }
 
+        if (deletedAccount.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Account already deleted",
+            });
+        }
+
         res.status(200).json({
             success: true,
             data: deletedAccount,
@@ -591,6 +598,46 @@ export const deleteAccount = async (req, res, next) => {
         next(error);
     }
 };
+
+export const restoreAccount = async (req, res, next) => {
+    try {
+        const { id: accountId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(accountId)) {
+            return res.status(404).json({
+                success: false,
+                message: "Account not found",
+            });
+        }
+
+        const restoredAccount = await ChartOfAccount.findOneAndUpdate(
+            { _id: accountId, isDeleted: true },
+            { isDeleted: false, restoredAt: new Date() },
+            { new: true, runValidators: true }
+        );
+
+        if (!restoredAccount) {
+            return res.status(404).json({
+                success: false,
+                message: "Account not found",
+            });
+        }
+
+        if (!restoredAccount.isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Account is not deleted",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: restoredAccount,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
 
 export const deleteAllAccountsPermanently = async (req, res, next) => {
     try {

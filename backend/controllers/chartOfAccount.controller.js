@@ -623,13 +623,6 @@ export const restoreAccount = async (req, res, next) => {
             });
         }
 
-        if (!restoredAccount.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Account is not deleted",
-            });
-        }
-
         res.status(200).json({
             success: true,
             data: restoredAccount,

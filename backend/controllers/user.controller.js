@@ -210,13 +210,6 @@ export const unblockUser = async (req, res, next) => {
       });
     }
 
-    if (updatedUser.status !== "blocked") {
-      return res.status(400).json({
-        success: false,
-        message: "User is not blocked",
-      });
-    }
-
     res.status(200).json({
       success: true,
       data: updatedUser,

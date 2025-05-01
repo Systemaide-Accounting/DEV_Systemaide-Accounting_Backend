@@ -9,12 +9,12 @@ const CashReceiptsTransactionSchema = mongoose.Schema(
     },
     month: {
       type: String,
-      required: [true, "Month is required"],
+      // required: [true, "Month is required"],
       trim: true,
     },
     year: {
       type: String,
-      required: [true, "Year is required"],
+      // required: [true, "Year is required"],
       trim: true,
     },
     location: {
@@ -30,17 +30,23 @@ const CashReceiptsTransactionSchema = mongoose.Schema(
       trim: true,
     },
     payorName: {
-      type: String,
-      required: [true, "Payor Name is required"],
+      // type: String,
+      // required: [true, "Payor Name is required"],
+      // trim: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AgentInfo",
+      required: [true, "Payor's Name is required"],
       trim: true,
     },
     address: {
+      // value is based on payor or agent
       type: String,
       required: [true, "Address is required"],
       maxlength: [255, "Address cannot exceed 255 characters"],
       trim: true,
     },
     tin: {
+      // value is based on payor or agent
       type: String,
       required: [true, "Tin is required"],
       maxlength: [255, "Tin cannot exceed 255 characters"],

@@ -32,15 +32,15 @@ export const getCashDisbursementTransactionReport = async (req, res, next) => {
 		}
 
 		const transactions = await CashDisbursementTransaction.find({
-		date: {
-			$gte: new Date(startDate),
-			$lte: new Date(endDate),
-		},
-		isDeleted: { $ne: true },
+			date: {
+				$gte: new Date(startDate),
+				$lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
+			},
+			isDeleted: { $ne: true },
 		})
-		.populate("location")
-		.populate("payeeName")
-		.populate("cashAccount");
+			.populate("location")
+			.populate("payeeName")
+			.populate("cashAccount");
 
 		// Decrypt TINs
 		const decryptedTransactions = transactions.map((tx) => {
@@ -96,7 +96,7 @@ export const getCashReceiptsTransactionReport = async (req, res, next) => {
 		const transactions = await CashReceiptsTransaction.find({
 			date: {
 				$gte: new Date(startDate),
-				$lte: new Date(endDate),
+				$lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
 			},
 			isDeleted: { $ne: true },
 		})
@@ -157,7 +157,7 @@ export const getSalesOnAccountReport = async (req, res, next) => {
 		const transactions = await SalesOnAccount.find({
 			date: {
 				$gte: new Date(startDate),
-				$lte: new Date(endDate),
+				$lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
 			},
 			isDeleted: { $ne: true },
 		}).populate("location");
@@ -209,7 +209,7 @@ export const getPurchaseOnAccountReport = async (req, res, next) => {
 		const transactions = await PurchaseOnAccountTransaction.find({
 			date: {
 				$gte: new Date(startDate),
-				$lte: new Date(endDate),
+				$lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
 			},
 			isDeleted: { $ne: true },
 		})
@@ -263,7 +263,7 @@ export const getGeneralJournalReport = async (req, res, next) => {
 		const transactions = await GeneralJournal.find({
 			date: {
 				$gte: new Date(startDate),
-				$lte: new Date(endDate),
+				$lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
 			},
 			isDeleted: { $ne: true },
 		}).populate("location");

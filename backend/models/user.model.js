@@ -61,6 +61,9 @@ const userSchema = mongoose.Schema(
         blockedAt: {
             type: Date,
         },
+        restoredAt: {
+			type: Date,
+		},
     },
     {
         timestamps: true,

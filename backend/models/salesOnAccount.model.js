@@ -75,6 +75,9 @@ const SalesOnAccountSchema = mongoose.Schema(
         deletedAt: {
             type: Date,
         },
+        restoredAt: {
+			type: Date,
+		},
     },
     {
         timestamps: true,

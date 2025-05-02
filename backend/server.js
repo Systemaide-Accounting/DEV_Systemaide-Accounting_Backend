@@ -23,6 +23,7 @@ import salesOnAccountRoutes from "./routes/salesOnAccount.route.js";
 import generalJournalRoutes from "./routes/generalJournal.route.js";
 import purchaseOnAccountTransactionRoutes from "./routes/purchaseOnAccountTransaction.route.js";
 import reportRoutes from "./routes/report.route.js";
+import transactionLogRoutes from "./routes/transactionLog.route.js"; // Import the transaction log routes
 
 // MIDDLEWARES
 import errorMiddleware from "./middlewares/error.middleware.js";
@@ -79,6 +80,7 @@ app.use("/api/purchase-on-account", purchaseOnAccountTransactionRoutes);
 app.use("/api/endpoints", endpointsRoutes);
 app.use("/api/general-journal", generalJournalRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/transaction-log", transactionLogRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);

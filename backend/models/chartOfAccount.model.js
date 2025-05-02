@@ -47,6 +47,9 @@ const chartOfAccountSchema = mongoose.Schema(
     deletedAt: {
       type: Date,
     },
+    restoredAt: {
+			type: Date,
+		},
   },
   {
     timestamps: true,

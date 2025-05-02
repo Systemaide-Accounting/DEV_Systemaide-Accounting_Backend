@@ -815,3 +815,79 @@ export const hasViewJournalReport = async (req, res, next) => {
         next(error);
     }
 }
+
+export const hasViewTransactionLog = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewTransactionLog")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view transaction log",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+}
+export const hasViewTransactionLogById = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("viewTransactionLogById")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to view transaction log by id",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+}
+export const hasCreateTransactionLog = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("createTransactionLog")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to create transaction log",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+}
+export const hasDeleteTransactionLog = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("deleteTransactionLog")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to delete transaction log",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+}
+export const hasRestoreTransactionLog = async (req, res, next) => {
+    try {
+        if (req.user.role && req.user.permissions.includes("restoreTransactionLog")) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No Permission to restore transaction log",
+        });
+    } catch (error) {
+        error.statusCode = 403;
+        next(error);
+    }
+}

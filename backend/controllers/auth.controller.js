@@ -189,7 +189,6 @@ export const forgotPassword = async (req, res, next) => {
 // Reset Password Controller
 export const resetPassword = async (req, res, next) => {
 	try {
-		console.log("Request body:", req.body);
 		const { email, code, newPassword } = req.body;
 
 		// Basic validation

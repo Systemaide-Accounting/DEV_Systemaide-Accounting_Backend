@@ -107,6 +107,10 @@ const initializePermissions = async () => {
           name: "deletePermission",
           description: "Delete Permission",
         },
+        {
+          name: "viewSystemConfig",
+          description: "View System Configuration Page",
+        },
       ];
 
       const count = await Permission.estimatedDocumentCount();

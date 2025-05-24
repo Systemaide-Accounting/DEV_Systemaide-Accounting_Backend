@@ -1,8 +1,8 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit'; // Import rate-limit
-import { isBearerTokenValid } from "../middlewares/auth.middleware.js";
+import { isAuthorized, isBearerTokenValid } from "../middlewares/auth.middleware.js";
 // Import new controller functions
-import { signIn, verifyUser, forgotPassword, resetPassword } from '../controllers/auth.controller.js';
+import { signIn, verifyUser, forgotPassword, resetPassword, signOut } from '../controllers/auth.controller.js';
 
 const router = express.Router();
 
@@ -17,6 +17,7 @@ const passwordResetLimiter = rateLimit({
 
 router.post("/signin", isBearerTokenValid, signIn);
 router.post("/verify", verifyUser);
+router.post("/signout", isAuthorized, signOut);
 
 // Add new routes with rate limiting
 router.post("/forgot-password", passwordResetLimiter, forgotPassword);

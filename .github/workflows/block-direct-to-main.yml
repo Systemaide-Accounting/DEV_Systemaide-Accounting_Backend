@@ -1,0 +1,45 @@
+name: Main Branch Protection
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  check-pr-origin:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if PR base is main and head is not staging
+        run: |
+          if [[ "${{ github.head_ref }}" != "staging" ]]; then
+            echo "ERROR: Pull requests must come from the staging branch."
+            exit 1
+          fi
+
+  detect-direct-push:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check push event details
+        run: |
+          # Get the commit message
+          # Get the commit message from the GitHub Actions context
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          
+          # Check if this appears to be a PR merge commit
+          if [[ ! $COMMIT_MSG =~ ^Merge\ pull\ request\ #[0-9]+.* ]]; then
+            echo "::warning::Direct push to main branch detected!"
+            echo "Changes have already been applied, but this violates branch policy."
+            echo "Future direct pushes should be prevented using branch protection rules."
+            
+            # Notify via email, Slack, or other methods (optional)
+            # This requires additional setup with secrets
+            # curl -X POST -H 'Content-type: application/json' --data '{"text":"⚠️ Direct push to main detected!"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+            
+            # Log the violation but don't fail the workflow since the push already happened
+            # For notification purposes only
+          fi

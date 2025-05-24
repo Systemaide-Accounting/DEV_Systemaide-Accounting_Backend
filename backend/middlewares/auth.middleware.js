@@ -90,7 +90,7 @@ export const isBearerTokenValid = async (req, res, next) => {
 
 export const isSysAdmin = async (req, res, next) => {
     try {
-        if(req.user.role === "sysadmin") { 
+        if(req?.user?.role === "sysadmin") { 
             return next();
         }
         

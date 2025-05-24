@@ -68,6 +68,8 @@ export const signIn = async (req, res, next) => {
 
 		// Reset failed attempts on successful login
 		existingUser.failedLoginAttempts = 0;
+		// Update status to active on successful login
+		existingUser.status = "active";
 		await existingUser.save();
 
 		// Convert to object and remove sensitive data
@@ -100,6 +102,35 @@ export const signIn = async (req, res, next) => {
 			message: "Sign in successful",
 			user: userObject,
 			accessToken: token,
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const signOut = async (req, res, next) => {
+	try {
+		const user = req?.user;
+		
+		const existingUser = await User.findOne({
+			_id: user?._id,
+			status: { $ne: "blocked" }, // Ensure user is not blocked
+		});
+
+		if (!existingUser) {
+			return res.status(404).json({
+				success: false,
+				message: "User not found",
+			});
+		}
+
+		// Update the user's status to inactive
+		existingUser.status = "inactive";
+		await existingUser.save();
+
+		res.status(200).json({
+			success: true,
+			message: "Sign out successful",
 		});
 	} catch (error) {
 		next(error);

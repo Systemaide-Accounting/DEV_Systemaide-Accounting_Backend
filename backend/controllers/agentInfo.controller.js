@@ -222,12 +222,12 @@ export const deleteAgent = async (req, res, next) => {
       });
     }
 
-    if (deletedAgent.isDeleted) {
-      return res.status(400).json({
-        success: false,
-        message: "Agent is already deleted",
-      });
-    }
+    // if (deletedAgent.isDeleted) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Agent is already deleted",
+    //   });
+    // }
 
 
     res.status(200).json({

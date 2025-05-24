@@ -173,12 +173,12 @@ export const deleteCashDisbursementTransaction = async (req, res, next) => {
             });
         }
 
-        if (deletedTransaction.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Cash disbursement transaction already deleted",
-            });
-        }
+        // if (deletedTransaction.isDeleted) {
+        //   return res.status(400).json({
+        //     success: false,
+        //     message: "Cash disbursement is already deleted",
+        //   });
+        // }
 
         res.status(200).json({
             success: true,
@@ -229,5 +229,39 @@ export const restoreCashDisbursementTransaction = async (req, res, next) => {
     }
 }
 
+export const getAllDeletedCashDisbursementTransactions = async (req, res, next) => {
+    try {
+        let deletedCashDisbursementTransactions = await CashDisbursementTransaction.find({
+            isDeleted: true,
+        })
+            .populate("location")
+            .populate("payeeName")
+            .populate("cashAccount");
+        
+        deletedCashDisbursementTransactions = deletedCashDisbursementTransactions.map(
+            (tx) => {
+            const txObj = tx.toObject();
+            try {
+                // Only attempt to decrypt if tin exists and is not empty
+                if (txObj.tin) {
+                txObj.tin = decryptTIN(txObj.tin);
+                }
+            } catch (decryptError) {
+                console.error(
+                `Failed to decrypt TIN for transaction ${txObj._id}:`,
+                decryptError.message
+                );
+                txObj.tin = ""; // Set to empty string on decryption failure
+            }
+                return txObj;
+            }
+        );
 
-
+        res.status(200).json({
+          success: true,
+          data: deletedCashDisbursementTransactions,
+        });
+    } catch (error) {
+        next(error);
+    }
+};

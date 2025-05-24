@@ -213,12 +213,12 @@ export const restoreCashDisbursementTransaction = async (req, res, next) => {
             });
         }
 
-        if(!restoredTransaction.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Cash disbursement transaction is not deleted",
-            });
-        }
+        // if(!restoredTransaction.isDeleted) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Cash disbursement transaction is not deleted",
+        //     });
+        // }
 
         res.status(200).json({
             success: true,

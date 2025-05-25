@@ -14,7 +14,7 @@ export const getAllCashReceiptsTransaction = async (req, res, next) => {
 			return {
 				...tx.toObject(),
 				// tin: decryptTIN(tx.tin),
-				tin: tx.tin ? decryptTIN(tx.tin) : "",
+				tin: tx?.tin ? decryptTIN(tx?.tin) : "",
 			};
 		});
 
@@ -80,7 +80,7 @@ export const getCashReceiptsTransactionById = async (req, res, next) => {
 			success: true,
 			data: {
 				...transaction.toObject(),
-				tin: decryptTIN(transaction.tin),
+				tin: decryptTIN(transaction?.tin),
 			},
 		});
 	} catch (error) {
@@ -156,12 +156,12 @@ export const deleteCashReceiptsTransaction = async (req, res, next) => {
 			});
 		}
 
-		if (deletedTransaction.isDeleted) {
-			return res.status(400).json({
-				success: false,
-				message: "Cash receipts transaction already deleted",
-			});
-		}
+		// if (deletedTransaction.isDeleted) {
+		// 	return res.status(400).json({
+		// 		success: false,
+		// 		message: "Cash receipts transaction already deleted",
+		// 	});
+		// }
 
 		res.status(200).json({
 			success: true,
@@ -196,12 +196,12 @@ export const restoreCashReceiptsTransaction = async (req, res, next) => {
 			});
 		}
 
-		if (!restoredTransaction.isDeleted) {
-			return res.status(400).json({
-				success: false,
-				message: "Cash receipts transaction is not deleted",
-			});
-		}
+		// if (!restoredTransaction.isDeleted) {
+		// 	return res.status(400).json({
+		// 		success: false,
+		// 		message: "Cash receipts transaction is not deleted",
+		// 	});
+		// }
 
 		res.status(200).json({
 			success: true,
@@ -211,3 +211,27 @@ export const restoreCashReceiptsTransaction = async (req, res, next) => {
 		next(error);
 	}
 }
+
+export const getAllDeletedCashReceiptsTransactions = async (req, res, next) => {
+	try {
+		let deletedTransactions = await cashReceiptsTransaction
+			.find({ isDeleted: true })
+			.populate("location")
+			.populate("cashAccount");
+		
+		// Decrypt TINs
+		deletedTransactions = deletedTransactions.map((tx) => {
+			return {
+				...tx.toObject(),
+				tin: tx?.tin ? decryptTIN(tx?.tin) : "",
+			};
+		});
+
+		res.status(200).json({
+			success: true,
+			data: deletedTransactions,
+		});
+	} catch (error) {
+		next(error);	
+	}
+};

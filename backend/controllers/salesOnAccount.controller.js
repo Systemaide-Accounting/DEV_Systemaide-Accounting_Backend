@@ -231,3 +231,36 @@ export const restoreSalesOnAccount = async (req, res, next) => {
         next(error);
     }
 }
+
+export const getAllDeletedSalesOnAccount = async (req, res, next) => {
+    try {
+        let deletedTransactions = await SalesOnAccount.find({
+            isDeleted: true,
+        }).populate("location");
+
+        // Decrypt TINs
+        deletedTransactions = deletedTransactions.map((tx) => {
+            const txObj = tx.toObject();
+            try {
+                // Only attempt to decrypt if tin exists and is not empty
+                if (txObj.tin) {
+                    txObj.tin = decryptTIN(txObj.tin);
+                }
+            } catch (decryptError) {
+                console.error(
+                    `Failed to decrypt TIN for transaction ${txObj._id}:`,
+                    decryptError.message
+                );
+                txObj.tin = ""; // Set to empty string on decryption failure
+            }
+            return txObj;
+        });
+
+        res.status(200).json({
+          success: true,
+          data: deletedTransactions,
+        });
+    } catch (error) {
+        next(error);
+    }
+};

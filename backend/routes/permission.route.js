@@ -9,6 +9,6 @@ router.get("/", isAuthorized, isSysAdmin, hasViewAllPermissions, getAllPermissio
 router.get("/:id", isAuthorized, isSysAdmin, hasViewPermissionById, getPermissionById);
 router.post("/", isAuthorized, isSysAdmin, hasCreatePermission, createPermission);
 router.patch("/:id", isAuthorized, isSysAdmin, hasUpdatePermission, updatePermission);
-router.delete("/delete/:id", isAuthorized, isSysAdmin, hasDeletePermission, deletePermission);
+router.delete("/:id", isAuthorized, isSysAdmin, hasDeletePermission, deletePermission);
 
 export default router;

@@ -182,3 +182,18 @@ export const restoreGeneralJournal = async (req, res, next) => {
 		next(error);
 	}
 }
+
+export const getAllDeletedGeneralJournal = async (req, res, next) => {
+	try {
+		let journals = await GeneralJournal.find({
+			isDeleted: true,
+		}).populate("location");
+
+		res.status(200).json({
+			success: true,
+			data: journals,
+		});
+	} catch (error) {
+		next(error);
+	}
+};

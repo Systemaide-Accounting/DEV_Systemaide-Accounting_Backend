@@ -248,3 +248,18 @@ export const restoreTransactionLog = async (req, res, next) => {
 		next(error);
 	}
 };
+
+export const getAllDeletedTransactionLogs = async (req, res, next) => {
+	try {
+		const deletedLogs = await TransactionLog.find({ isDeleted: true })
+			.populate("transactionId") // Dynamically populated based on the `transaction` field
+			.populate("remarks_by"); // Populate the remarks_by user reference if needed
+
+		res.status(200).json({
+			success: true,
+			data: deletedLogs,
+		});
+	} catch (error) {
+		next(error);
+	}
+}

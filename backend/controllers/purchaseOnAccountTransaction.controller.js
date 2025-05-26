@@ -211,3 +211,25 @@ export const restorePurchaseOnAccountTransaction = async (req, res, next) => {
         next(error);
     }
 }
+
+export const getAllDeletedPurchaseOnAccountTransactions = async (req, res, next) => {
+    try {
+        let deletedTransactions = await PurchaseOnAccountTransaction.find({
+            isDeleted: true,
+        })
+            .populate("location")
+            .populate("supplierName");
+
+        deletedTransactions = deletedTransactions.map((tx) => ({
+            ...tx.toObject(),
+            tin: decryptTIN(tx?.tin),
+        }));
+
+        res.status(200).json({
+          success: true,
+          data: deletedTransactions,
+        });
+    } catch (error) {
+        next(error);
+    }
+}

@@ -261,15 +261,14 @@ export const restoreAgent = async (req, res, next) => {
         success: false,
         message: "Agent not found",
       });
-      
-    if (!restoredAgent.isDeleted) {
-      return res.status(400).json({
-        success: false,
-        message: "Agent is not deleted",
-      });
     }
 
-    }
+    // if (!restoredAgent.isDeleted) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Agent is not deleted",
+    //   });
+    // }
 
     res.status(200).json({
       success: true,

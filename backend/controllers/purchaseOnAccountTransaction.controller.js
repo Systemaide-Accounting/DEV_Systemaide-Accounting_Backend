@@ -155,12 +155,12 @@ export const deletePurchaseOnAccountTransaction = async (req, res, next) => {
             });
         }
 
-        if (deletedTransaction.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Transaction is already deleted",
-            });
-        }
+        // if (deletedTransaction.isDeleted) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Transaction is already deleted",
+        //     });
+        // }
 
         res.status(200).json({
             success: true,
@@ -195,12 +195,12 @@ export const restorePurchaseOnAccountTransaction = async (req, res, next) => {
             });
         }
 
-        if (!restoredTransaction.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Transaction is not deleted",
-            });
-        }
+        // if (!restoredTransaction.isDeleted) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Transaction is not deleted",
+        //     });
+        // }
 
 
         res.status(200).json({

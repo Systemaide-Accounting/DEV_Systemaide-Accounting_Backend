@@ -5,7 +5,7 @@ import { hasCreateUser, hasDeleteUser, hasUpdateUser, hasViewAllUsers, hasViewUs
 
 const router = express.Router();
 
-router.get("/blocked", isAuthorized, isSysAdmin, getAllBlockedUsers);
+router.get("/blocked", isAuthorized, isSysAdmin, hasRestoreUser, getAllBlockedUsers);
 
 router.get("/", isAuthorized, isSysAdmin, hasViewAllUsers, getAllUsers);
 router.post("/", isAuthorized, isSysAdmin, hasCreateUser, createUser);

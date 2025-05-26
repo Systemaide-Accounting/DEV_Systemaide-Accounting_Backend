@@ -27,7 +27,7 @@ export const getAllAgents = async (req, res, next) => {
           const agentObj = agent.toObject();
           try {
             // Only attempt to decrypt if tin exists and is not empty
-            if (agentObj.tin) {
+            if (agentObj?.tin) {
               agentObj.tin = decryptTIN(agentObj.tin);
             }
           } catch (decryptError) {
@@ -279,3 +279,34 @@ export const restoreAgent = async (req, res, next) => {
     next(error);
   }
 }
+
+export const getAllDeletedAgents = async (req, res, next) => {
+  try {
+    let deletedAgents = await AgentInfo.find({ isDeleted: true });
+
+    // Decrypt TINs for deleted agents
+    deletedAgents = deletedAgents.map((agent) => {
+      const agentObj = agent.toObject();
+      try {
+        // Only attempt to decrypt if tin exists and is not empty
+        if (agentObj?.tin) {
+          agentObj.tin = decryptTIN(agentObj.tin);
+        }
+      } catch (decryptError) {
+        console.error(
+          `Failed to decrypt TIN for deleted agent ${agentObj._id}:`,
+          decryptError.message
+        );
+        agentObj.tin = ""; // Set to empty string on decryption failure
+      }
+      return agentObj;
+    });
+
+    res.status(200).json({
+      success: true,
+      data: deletedAgents,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

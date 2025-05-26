@@ -32,7 +32,7 @@ export const getAllLocations = async (req, res, next) => {
           const locationObj = location.toObject();
           try {
             // Only attempt to decrypt if tin exists and is not empty
-            if (locationObj.tin) {
+            if (locationObj?.tin) {
               locationObj.tin = decryptTIN(locationObj.tin);
             }
           } catch (decryptError) {
@@ -240,12 +240,12 @@ export const deleteLocation = async (req, res, next) => {
           });
         }
 
-        if (deletedLocation.isDeleted) {
-          return res.status(400).json({
-            success: false,
-            message: "Location is already deleted",
-          });
-        }
+        // if (deletedLocation.isDeleted) {
+        //   return res.status(400).json({
+        //     success: false,
+        //     message: "Location is already deleted",
+        //   });
+        // }
 
         res.status(200).json({
           success: true,
@@ -297,3 +297,41 @@ export const restoreLocation = async (req, res, next) => {
         next(error);
     }
 }
+
+export const getAllDeletedLocations = async (req, res, next) => {
+  try {
+    let deletedLocations = await Location.find({ isDeleted: true }).populate("branch");
+
+    // check if branch is deleted
+    deletedLocations.forEach(async (location) => {
+      if (location?.branch && location.branch?.isDeleted) {
+        location.branch = null;
+      }
+    });
+
+    // Decrypt TIN if needed
+    deletedLocations = deletedLocations.map((location) => {
+      const locationObj = location.toObject();
+      try {
+        // Only attempt to decrypt if tin exists and is not empty
+        if (locationObj?.tin) {
+          locationObj.tin = decryptTIN(locationObj.tin);
+        }
+      } catch (decryptError) {
+        console.error(
+          `Failed to decrypt TIN for transaction ${locationObj._id}:`,
+          decryptError.message
+        );
+        locationObj.tin = ""; // Set to empty string on decryption failure
+      }
+      return locationObj;
+    });
+
+    res.status(200).json({
+      success: true,
+      data: deletedLocations,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

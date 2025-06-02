@@ -229,12 +229,12 @@ export const restoreBranch = async (req, res, next) => {
 			});
 		}
 
-		if (!restoredBranch.isDeleted) {
-			return res.status(400).json({
-				success: false,
-				message: "Branch is not deleted",
-			});
-		}
+		// if (!restoredBranch.isDeleted) {
+		// 	return res.status(400).json({
+		// 		success: false,
+		// 		message: "Branch is not deleted",
+		// 	});
+		// }
 
 		res.status(200).json({
 			success: true,

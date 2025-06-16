@@ -218,3 +218,15 @@ export const unblockUser = async (req, res, next) => {
     next(error);
   }
 }
+
+export const getAllBlockedUsers = async (req, res, next) => {
+  try {
+    const blockedUsers = await User.find({ status: "blocked" }).select("-password");
+    res.status(200).json({
+      success: true,
+      data: blockedUsers,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

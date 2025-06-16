@@ -127,12 +127,12 @@ export const deleteGeneralJournal = async (req, res, next) => {
             });
         }
 
-		if (deletedJournal.isDeleted) {
-			return res.status(404).json({
-				success: false,
-				message: "Journal is already deleted",
-			});
-		}
+		// if (deletedJournal.isDeleted) {
+		// 	return res.status(404).json({
+		// 		success: false,
+		// 		message: "Journal is already deleted",
+		// 	});
+		// }
 
         res.status(200).json({
             success: true,
@@ -167,12 +167,12 @@ export const restoreGeneralJournal = async (req, res, next) => {
 			});
 		}
 
-		if (!restoredJournal.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Journal is not deleted",
-            });
-        }
+		// if (!restoredJournal.isDeleted) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Journal is not deleted",
+        //     });
+        // }
 
 		res.status(200).json({
 			success: true,
@@ -182,3 +182,18 @@ export const restoreGeneralJournal = async (req, res, next) => {
 		next(error);
 	}
 }
+
+export const getAllDeletedGeneralJournal = async (req, res, next) => {
+	try {
+		let journals = await GeneralJournal.find({
+			isDeleted: true,
+		}).populate("location");
+
+		res.status(200).json({
+			success: true,
+			data: journals,
+		});
+	} catch (error) {
+		next(error);
+	}
+};

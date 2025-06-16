@@ -107,7 +107,7 @@ export const getAllAccounts = async (req, res, next) => {
         );
       }
 
-      if (account.subAccounts && account.subAccounts.length > 0) {
+      if (account?.subAccounts && account.subAccounts.length > 0) {
         account.subAccounts.forEach((subAccount) => {
           if (
             subAccount.parentAccount &&
@@ -583,12 +583,12 @@ export const deleteAccount = async (req, res, next) => {
             });
         }
 
-        if (deletedAccount.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Account already deleted",
-            });
-        }
+        // if (deletedAccount.isDeleted) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Account already deleted",
+        //     });
+        // }
 
         res.status(200).json({
             success: true,
@@ -644,4 +644,17 @@ export const deleteAllAccountsPermanently = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+
+export const getAllDeletedAccounts = async (req, res, next) => {
+  try {
+    const deletedAccounts = await ChartOfAccount.find({ isDeleted: true });
+
+    res.status(200).json({
+      success: true,
+      data: deletedAccounts,
+    });
+  } catch (error) {
+    next(error);
+  }
 };

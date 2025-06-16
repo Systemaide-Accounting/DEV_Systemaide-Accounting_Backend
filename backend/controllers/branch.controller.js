@@ -19,8 +19,8 @@ export const getAllBranches = async (req, res, next) => {
 			const branchObj = branch.toObject();
 			try {
 				// Only attempt to decrypt if tin exists and is not empty
-				if (branchObj.tin) {
-					branchObj.tin = decryptTIN(branchObj.tin);
+				if (branchObj?.tin) {
+					branchObj.tin = decryptTIN(branchObj?.tin);
 				}
 			} catch (decryptError) {
 				console.error(
@@ -189,12 +189,12 @@ export const deleteBranch = async (req, res, next) => {
 			});
 		}
 
-		if (deletedBranch.isDeleted) {
-			return res.status(400).json({
-				success: false,
-				message: "Branch is already deleted",
-			});
-		}
+		// if (deletedBranch.isDeleted) {
+		// 	return res.status(400).json({
+		// 		success: false,
+		// 		message: "Branch is already deleted",
+		// 	});
+		// }
 
 		res.status(200).json({
 			success: true,
@@ -229,16 +229,47 @@ export const restoreBranch = async (req, res, next) => {
 			});
 		}
 
-		if (!restoredBranch.isDeleted) {
-			return res.status(400).json({
-				success: false,
-				message: "Branch is not deleted",
-			});
-		}
+		// if (!restoredBranch.isDeleted) {
+		// 	return res.status(400).json({
+		// 		success: false,
+		// 		message: "Branch is not deleted",
+		// 	});
+		// }
 
 		res.status(200).json({
 			success: true,
 			data: restoredBranch,
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const getAllDeletedBranches = async (req, res, next) => {
+	try {
+		let deletedBranches = await Branch.find({ isDeleted: true });
+
+		// Decrypt TINs
+		deletedBranches = deletedBranches.map((branch) => {
+			const branchObj = branch.toObject();
+			try {
+				// Only attempt to decrypt if tin exists and is not empty
+				if (branchObj?.tin) {
+					branchObj.tin = decryptTIN(branchObj?.tin);
+				}
+			} catch (decryptError) {
+				console.error(
+					`Failed to decrypt TIN for transaction ${branchObj._id}:`,
+					decryptError.message
+				);
+				branchObj.tin = ""; // Set to empty string on decryption failure
+			}
+			return branchObj;
+		});
+
+		res.status(200).json({
+			success: true,
+			data: deletedBranches,
 		});
 	} catch (error) {
 		next(error);

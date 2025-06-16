@@ -303,11 +303,13 @@ export const getAllDeletedLocations = async (req, res, next) => {
     let deletedLocations = await Location.find({ isDeleted: true }).populate("branch");
 
     // check if branch is deleted
-    deletedLocations.forEach(async (location) => {
-      if (location?.branch && location.branch?.isDeleted) {
-        location.branch = null;
-      }
-    });
+    await Promise.all(
+      deletedLocations.map(async (location) => {
+        if (location?.branch && location.branch?.isDeleted) {
+          location.branch = null;
+        }
+      })
+    );
 
     // Decrypt TIN if needed
     deletedLocations = deletedLocations.map((location) => {

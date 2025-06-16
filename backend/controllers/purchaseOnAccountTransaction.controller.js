@@ -155,12 +155,12 @@ export const deletePurchaseOnAccountTransaction = async (req, res, next) => {
             });
         }
 
-        if (deletedTransaction.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Transaction is already deleted",
-            });
-        }
+        // if (deletedTransaction.isDeleted) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Transaction is already deleted",
+        //     });
+        // }
 
         res.status(200).json({
             success: true,
@@ -195,17 +195,39 @@ export const restorePurchaseOnAccountTransaction = async (req, res, next) => {
             });
         }
 
-        if (!restoredTransaction.isDeleted) {
-            return res.status(400).json({
-                success: false,
-                message: "Transaction is not deleted",
-            });
-        }
+        // if (!restoredTransaction.isDeleted) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Transaction is not deleted",
+        //     });
+        // }
 
 
         res.status(200).json({
             success: true,
             data: restoredTransaction,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const getAllDeletedPurchaseOnAccountTransactions = async (req, res, next) => {
+    try {
+        let deletedTransactions = await PurchaseOnAccountTransaction.find({
+            isDeleted: true,
+        })
+            .populate("location")
+            .populate("supplierName");
+
+        deletedTransactions = deletedTransactions.map((tx) => ({
+            ...tx.toObject(),
+            tin: tx?.tin ? decryptTIN(tx.tin) : "",
+        }));
+
+        res.status(200).json({
+          success: true,
+          data: deletedTransactions,
         });
     } catch (error) {
         next(error);

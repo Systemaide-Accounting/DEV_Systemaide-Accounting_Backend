@@ -16,8 +16,8 @@ router.get("/", isAuthorized, hasViewAllAccounts, getAllAccounts);
 router.get("/:id", isAuthorized, hasViewAccountById, getAccountById);
 router.post("/", isAuthorized, hasCreateAccount, createAccount);
 router.patch("/:id", isAuthorized, hasUpdateAccount, updateAccount);
-router.delete("/:id", isAuthorized, hasDeleteAccount, deleteAccount);
 router.delete("/all", isAuthorized, hasDeleteAccount, deleteAllAccountsPermanently);
+router.delete("/:id", isAuthorized, hasDeleteAccount, deleteAccount);
 router.patch("/restore/:id", isAuthorized, hasRestoreAccount, restoreAccount);
 
 export default router;

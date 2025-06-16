@@ -222,7 +222,7 @@ export const getAllDeletedPurchaseOnAccountTransactions = async (req, res, next)
 
         deletedTransactions = deletedTransactions.map((tx) => ({
             ...tx.toObject(),
-            tin: decryptTIN(tx?.tin),
+            tin: tx?.tin ? decryptTIN(tx.tin) : "",
         }));
 
         res.status(200).json({
